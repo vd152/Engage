@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'media'
     },
+    role: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'roles'
+    },
     groups: [
       { 
         type: mongoose.Schema.Types.ObjectId,

@@ -32,7 +32,11 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use('/user', userRouter);
-app.get('/', passport.authenticate('jwt',{session: false}), (req,res)=>{
+
+app.get("/abc", passport.authenticate('jwt',{session: false}), (req, res) =>{
+  res.send("Hey");
+})
+app.get('/', (req,res)=>{
     res.send("Hi there")
 })
 
