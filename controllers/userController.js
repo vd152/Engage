@@ -2,56 +2,50 @@ const User = require('../models/userModel')
 const util = require('../utils/generateToken')
 
 exports.registerUser = async(req, res) => {
-    // const {name, email, password, dob} = req.body;
+    const { email, password, role} = req.body;
 
-    // if(!name || !email || !password || !dob){
-    //     return res.status(422).json({
-    //         success: false,
-    //         message: "Please fill all the required fields."
-    //     })
-    // }
-    // let userExists;
-    // try{
-    //     userExists = await User.findOne({email})
-    // }catch(err){
-    //     console.log(err)
-    //     return res.status(500).json({
-    //         success: false,
-    //         message: "Something went wrong"
-    //     })
-    // }
+    if(!email || !password || !role){
+        return res.status(422).json({
+            success: false,
+            message: "Please fill all the required fields."
+        })
+    }
+    let userExists;
+    try{
+        userExists = await User.findOne({email})
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong."
+        })
+    }
 
-    // if(userExists){
-    //     return res.status(400).json({
-    //         success: false,
-    //         message: "User already exists"
-    //     })
-    // }
+    if(userExists){
+        return res.status(400).json({
+            success: false,
+            message: "User already exists"
+        })
+    }
 
-    // const user = new User({
-    //     name, email, password, dob
-    // })
-
-    // user
-    // .save()
-    // .then(user=>{
-    //     return res.status(200).json({
-    //         success: true, 
-    //         data: {
-    //             name: user.name,
-    //             email: user.email,
-    //             dob: user.dob,
-    //             token: util.generateToken(user._id)
-    //         }
-    //     })
-    // })
-    // .catch(err=>{
-    //     console.log(err)
-    //     return res.status(500).json({
-    //         success: false, 
-    //         message: "Something went wrong"
-    //     })
-    // })
+    const user = new User(req.body)
+    console.log(user);
+    user
+    .save()
+    .then(user=>{
+        return res.status(200).json({
+            success: true, 
+            user,
+            token: util.generateToken(user._id)
+        })
+    })
+    .catch(err=>{
+        console.log(err)
+        return res.status(500).json({
+            success: false, 
+            message: "Something went wrong"
+        })
+    })
 
 }
 
@@ -79,9 +73,7 @@ exports.loginUser = async(req, res) => {
         return res.status(200).json({
             success: true,
             data: {
-                name: user.name,
-                email: user.email,
-                dob: user.dob,
+                user: user,
                 token: util.generateToken(user._id)
             }
         })
