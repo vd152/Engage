@@ -1,7 +1,7 @@
 import React from "react";
 import "./auth.css";
 import api from '../../apis/api';
-import {setAuthToken} from '../../utils/localStorage'
+import {setAuthToken, setPermission} from '../../utils/localStorage'
 import {Redirect} from 'react-router-dom'
 
 class Auth extends React.Component {
@@ -13,7 +13,8 @@ class Auth extends React.Component {
 
   handleLogin = () =>{
     api.post('/user/login', {email: this.state.email, password: this.state.password}).then(res=>{
-      setAuthToken(res.data.data.token)
+      setAuthToken(res.data.token)
+      setPermission(res.data.user.role)
       this.setState({redirect: true})
     }).catch(err=>{
       console.log(err)
