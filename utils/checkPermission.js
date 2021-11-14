@@ -19,7 +19,6 @@ const result = async (id, permission) => {
   return output;
 };
 const hasPermissions = async (req, res, next) => {
-  // console.log(req);
   if (await result(req.user.role, req.body.requiredPermission)) return next();
   else
     return res.status(401).json({
