@@ -1,20 +1,22 @@
 const User = require("../models/userModel");
 const util = require("../utils/generateToken");
-exports.getUser = async(req,res) =>{
+exports.getUsers = async (req, res) => {
   User.find()
     .populate("role")
-    .select("-password").then(user=>{
+    .select("-password")
+    .then((user) => {
       res.status(200).json({
         success: true,
-        user
-      })
-    }).catch(err=>{
+        user,
+      });
+    })
+    .catch((err) => {
       return res.status(500).json({
         success: false,
         message: "something went wrong",
       });
-    })
-}
+    });
+};
 exports.registerUser = async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -93,4 +95,22 @@ exports.loginUser = async (req, res) => {
       message: "Invalid email or password.",
     });
   }
+};
+
+exports.getUser = async (req, res) => {
+  let id = req.params.id;
+  User.findById(id)
+    .select("-password")
+    .then((user) => {
+      return res.status(200).json({
+        success: true,
+        user
+      })
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        success: "false",
+        message: "Something went wrong",
+      });
+    });
 };

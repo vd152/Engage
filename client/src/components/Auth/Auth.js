@@ -1,9 +1,8 @@
 import React from "react";
 import "./auth.css";
 import api from '../../apis/api';
-import {setAuthToken, setPermission} from '../../utils/localStorage'
+import {setAuthToken, setUser} from '../../utils/localStorage'
 import {Redirect} from 'react-router-dom'
-
 class Auth extends React.Component {
   state={
     email: "",
@@ -14,14 +13,14 @@ class Auth extends React.Component {
   handleLogin = () =>{
     api.post('/user/login', {email: this.state.email, password: this.state.password}).then(res=>{
       setAuthToken(res.data.token)
-      setPermission(res.data.user.role)
+      setUser(res.data.user._id)
       this.setState({redirect: true})
     }).catch(err=>{
       console.log(err)
     })
   }
   render() {
-    if(this.state.redirect) return <Redirect to="/"/>
+    if(this.state.redirect) window.location.reload()
     return (
       <div className="auth">
         <div className="auth__header">
@@ -74,4 +73,5 @@ class Auth extends React.Component {
     );
   }
 }
-export default Auth;
+
+export default (Auth);

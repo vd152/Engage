@@ -1,5 +1,19 @@
 const Role = require('../models/roleModel');
 
+exports.getRoles = async(req,res) => {
+    Role
+     .find().then(role=>{
+        res.status(200).json({
+          success: true,
+          role
+        })
+      }).catch(err=>{
+        return res.status(500).json({
+          success: false,
+          message: "something went wrong",
+        });
+      })
+}
 exports.addRole = async(req, res) => {
     const {name, permissions} = req.body;
 

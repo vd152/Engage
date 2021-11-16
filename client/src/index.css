@@ -9,3 +9,13 @@ html, body, #root {
     padding: 0.5em;
     color: #4e4fa1;
 }
+
+.add-button{
+    background-color: #4e4fa1;
+    color: #fff;
+    border: none ;
+    box-shadow: none
+}
+.add-button:hover{
+    background-color: #424492;
+}

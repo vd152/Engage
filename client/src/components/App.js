@@ -1,3 +1,3 @@
-import router from '../routes/appRouter';
-const App = () => router;
+import Router from '../routes/appRouter';
+const App = () => <Router/>;
 export default App;

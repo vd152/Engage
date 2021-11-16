@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { connect } from "react-redux";
-import {setActive} from '../../../redux/actions/SidebarActions'
+import { setActive } from "../../../redux/actions/SidebarActions";
 import "./sidebar.css";
 
 class Sidebar extends React.Component {
-  state={url: ""}
+  state = { url: "" };
   render() {
-    if(this.state.url != "") return <Redirect to={this.state.url}/>
+    if (this.state.url != "") return <Redirect to={this.state.url} />;
     return (
       <div
         className={
@@ -15,51 +15,108 @@ class Sidebar extends React.Component {
         }
       >
         <div className="sideNavItems">
-          <div className={"sideNavlink"}>
-            <div className={this.props.active === "Chat" ? "activeLink" : ""}>
+          <div             className="sideNavlink"
+            onClick={(e) => {
+              this.props.setActive("Home");
+              this.setState({ url: "/" });
+            }}>
+            <div className={this.props.active === "Home" ? "activeLink" : ""}>
               <img
+              className="currentSideBarIcon"
                 src={
-                  this.props.active === "Chat"
-                    ? "/assets/images/chat-hover.png"
-                    : "/assets/images/chat.png"
+                  this.props.active === "Home"
+                    ? "/assets/images/home-hover.png"
+                    : "/assets/images/home.png"
                 }
-                alt="chat"
+                alt="Home"
               />
             </div>
-            <div className={this.props.active === "Chat" ? "activeSideNavLink" : ""}>
-              Chat
+            <div
+              className={
+                this.props.active === "Home" ? "activeSideNavLink" : ""
+              }
+            >
+              Home
             </div>
           </div>
-          <div className="sideNavlink">
-            <div className={this.props.active === "Teams" ? "activeLink" : ""}>
+          <div
+            className="sideNavlink"
+            onClick={(e) => {
+              this.props.setActive("Groups");
+              this.setState({ url: "groups" });
+            }}
+          >
+            <div className={this.props.active === "Groups" ? "activeLink" : ""}>
               <img
                 className="currentSideBarIcon"
                 src={
-                  this.props.active === "Teams"
-                    ? "/assets/images/teams-hover.png"
-                    : "/assets/images/teams.png"
+                  this.props.active === "Groups"
+                    ? "/assets/images/group-hover.png"
+                    : "/assets/images/group.png"
                 }
-                alt="teams"
+                alt="Groups"
               />
             </div>
-            <div className={this.props.active === "Teams" ? "activeSideNavLink" : ""}>
-              Teams
+            <div
+              className={
+                this.props.active === "Groups" ? "activeSideNavLink" : ""
+              }
+            >
+              Groups
             </div>
           </div>
-          <div className="sideNavlink">
-            <div className={this.props.active === "Contacts" ? "activeLink" : ""}>
+          <div
+            className="sideNavlink"
+            onClick={(e) => {
+              this.props.setActive("Schedule");
+              this.setState({ url: "schedule" });
+            }}
+          >
+            <div
+              className={this.props.active === "Schedule" ? "activeLink" : ""}
+            >
               <img
-                alt="contacts"
                 className="currentSideBarIcon"
                 src={
-                  this.props.active === "Contacts"
-                    ? "/assets/images/files-hover.png"
-                    : "/assets/images/files.png"
+                  this.props.active === "Schedule"
+                    ? "/assets/images/schedule-hover.png"
+                    : "/assets/images/schedule.png"
+                }
+                alt="Schedule"
+              />
+            </div>
+            <div
+              className={
+                this.props.active === "Schedule" ? "activeSideNavLink" : ""
+              }
+            >
+              Schedule
+            </div>
+          </div>
+          <div
+            className="sideNavlink"
+            onClick={(e) => {
+              this.props.setActive("Forum");
+              this.setState({ url: "forum" });
+            }}
+          >
+            <div className={this.props.active === "Forum" ? "activeLink" : ""}>
+              <img
+                alt="Forum"
+                className="currentSideBarIcon"
+                src={
+                  this.props.active === "Forum"
+                    ? "/assets/images/forum-hover.png"
+                    : "/assets/images/forum.png"
                 }
               />
             </div>
-            <div className={this.props.active === "Contacts" ? "activeSideNavLink" : ""}>
-              Contacts
+            <div
+              className={
+                this.props.active === "Forum" ? "activeSideNavLink" : ""
+              }
+            >
+              Forum
             </div>
           </div>
 
@@ -67,7 +124,7 @@ class Sidebar extends React.Component {
             className="sideNavlink"
             onClick={(e) => {
               this.props.setActive("Users");
-              this.setState({url: "user-role"})
+              this.setState({ url: "user-role" });
             }}
           >
             <div className={this.props.active === "Users" ? "activeLink" : ""}>
@@ -75,13 +132,17 @@ class Sidebar extends React.Component {
                 className="currentSideBarIcon"
                 src={
                   this.props.active === "Users"
-                    ? "/assets/images/teams-hover.png"
-                    : "/assets/images/teams.png"
+                    ? "/assets/images/user-roles-hover.png"
+                    : "/assets/images/user-roles.png"
                 }
                 alt="UsersRoles"
               />
             </div>
-            <div className={this.props.active === "Users" ? "activeSideNavLink" : ""}>
+            <div
+              className={
+                this.props.active === "Users" ? "activeSideNavLink" : ""
+              }
+            >
               Users & Roles
             </div>
           </div>
@@ -91,9 +152,10 @@ class Sidebar extends React.Component {
     );
   }
 }
-const mapStateToProps = (state) =>{
+const mapStateToProps = (state) => {
   return {
-    active: state.getActive.active
-  }
-}
-export default connect(mapStateToProps, {setActive})(Sidebar);
+    active: state.getActive.active,
+    user: state.currentUser.user,
+  };
+};
+export default connect(mapStateToProps, { setActive })(Sidebar);

@@ -63,6 +63,7 @@ export default class User extends React.Component {
     render(){
         return(
             <div>
+                <button className="btn add-button">Add a user</button>
             <DataTableExtensions {...this.state.tableData}>
                 <DataTable
                   noHeader

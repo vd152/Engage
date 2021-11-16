@@ -44,6 +44,9 @@
     width: 0;
     height: 0;
   }
+  .currentSideBarIcon{
+    width: 24px
+  }
   .currentSideBarIcon:hover {
     /* display: none; */
     color: #7f81e1;

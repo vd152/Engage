@@ -1,6 +1,5 @@
 import React from "react";
-
-
+import {removeAuthToken, removeUser} from '../../../utils/localStorage'
 import "./topbar.css";
 
 const Topbar = (props) => {
@@ -25,6 +24,13 @@ const Topbar = (props) => {
             className="headerBarSearchInput"
             placeholder="Search"
           />
+        </div>
+        <div className="p-2 logout" onClick={(e)=>{
+          removeAuthToken()
+          removeUser()
+          window.location.reload()
+        }}>
+          <img src="/assets/images/logout.png" width="20"></img>
         </div>
       </div>
     </div>

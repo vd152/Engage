@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import api from '../../apis/api'
-
+import {format} from 'timeago.js'
 export default class Role extends React.Component {
     state={
         tableData: {
@@ -18,6 +18,11 @@ export default class Role extends React.Component {
                 name: "Role",
                 selector: row=>row.role,
                 sortable: true,
+              },
+              {
+                name: "Created",
+                selector: row=>row.created,
+                sortable: true,
               }
             ],
             data: [],
@@ -26,29 +31,27 @@ export default class Role extends React.Component {
     componentDidMount(){
         const datalist = []
         var i = 0
-        // api.post('/user', {requiredPermission: "Create User"}).then(res=>{
-        //     console.log(res.data.user)
-        //     res.data.user.forEach(val=>{
-        //         i++;
-        //         let temp = {
-        //             id: i,
-        //             enrollmentNumber: val.enrollmentNumber,
-        //             name: val.firstName + " " + val.lastName,
-        //             email: val.email, 
-        //             role: val.role?.name
-        //         }
-        //         datalist.push(temp)
-        //     })
-        //     const { tableData } = this.state;
-        //     tableData["data"] = datalist;
-        //     this.setState({ tableData });
-        // }).catch(err=>{
-        //     console.log(err)
-        // })
+        api.post('/role', {requiredPermission: "Create Role"}).then(res=>{
+            res.data.role.forEach(val=>{
+                i++;
+                let temp = {
+                    id: i,
+                    role: val.name,
+                    created: format(val.createdAt)
+                }
+                datalist.push(temp)
+            })
+            const { tableData } = this.state;
+            tableData["data"] = datalist;
+            this.setState({ tableData });
+        }).catch(err=>{
+            console.log(err)
+        })
     }
     render(){
         return(
             <div>
+                              <button className="btn add-button">Add a role</button>
             <DataTableExtensions {...this.state.tableData}>
                 <DataTable
                   noHeader

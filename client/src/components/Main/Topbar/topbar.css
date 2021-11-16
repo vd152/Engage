@@ -116,7 +116,9 @@
     color: #ddd;
     cursor: pointer;
   }
-  
+  .logout{
+    cursor: pointer;
+  }
   @media only screen and (max-width: 862px) {
     .headBarSearch {
       /* flex: 12;

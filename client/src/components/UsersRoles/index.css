@@ -1,7 +1,12 @@
 .nav-item .active{
     background-color: #4e4fa1 !important;
+    color: rgba(255, 255, 255, 0.856)
 }
 .nav-link{
     cursor: pointer;
     color: #4e4fa1;
+}
+
+.add-button:hover{
+    color: rgba(255, 255, 255, 0.856)
 }
