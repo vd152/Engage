@@ -1,7 +1,9 @@
 .grouptile{
     border: 1px solid #4e4fa1;
     padding: 1em;
-    margin: 0.5em
+}
+.group-row{
+    gap: 12px
 }
 .group-img{
     width: 50px;
@@ -9,4 +11,12 @@
 .group-text{
     font-size:0.8em;
     color: #4e4fa1;
+}
+.btn-container{
+    text-align: end;
+    display: flex;
+}
+.btn-container .btn{
+    margin: 12px;
+    padding: 0px 12px
 }

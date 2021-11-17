@@ -100,6 +100,7 @@ exports.loginUser = async (req, res) => {
 exports.getUser = async (req, res) => {
   let id = req.params.id;
   User.findById(id)
+    .populate("role")
     .select("-password")
     .then((user) => {
       return res.status(200).json({

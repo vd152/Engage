@@ -19,3 +19,12 @@ html, body, #root {
 .add-button:hover{
     background-color: #424492;
 }
+
+.btn:focus{
+    box-shadow:none !important;border: none;
+    background-color: #424492;
+}
+input:focus, input:active{
+    box-shadow:none !important;
+    
+}
