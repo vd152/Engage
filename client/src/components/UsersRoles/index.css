@@ -10,3 +10,16 @@
 .add-button:hover{
     color: rgba(255, 255, 255, 0.856)
 }
+.row-btn{
+    background-color: none;
+    background: none;
+    border: none;
+    padding: 3px;
+}
+.row-btn:hover{
+    border: 1px solid black;
+}
+.row-btn:active, .row-btn:focus{
+    background-color: none;
+    border: none;
+}

@@ -3,9 +3,11 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import api from '../../apis/api'
+import {FaEdit,FaTrashAlt } from 'react-icons/fa'
 
 export default class User extends React.Component {
     state={
+      loading: false,
         tableData: {
             columns: [
               {
@@ -33,12 +35,33 @@ export default class User extends React.Component {
                 name: "Role",
                 selector: row=>row.role,
                 sortable: true,
+              },
+              { 
+                name: "Edit",
+                width: "60px",
+                cell: (row)=> <button className=" row-btn" onClick={(e)=>{e.preventDefault();
+                  this.handleEdit(row)
+                }}><FaEdit /></button>
+              },
+              { 
+                name: "Delete",
+                width: "60px",
+                cell: (row)=> <button className=" row-btn" onClick={(e)=>{e.preventDefault();
+                  this.handleDelete(row)
+                }}><FaTrashAlt /></button>
               }
             ],
             data: [],
           },
     }
+    handleEdit = (row) => {
+      console.log(row)
+    }
+    handleDelete = (row) =>{
+      
+    }
     componentDidMount(){
+      this.setState({loading: true})
         const datalist = []
         var i = 0
         api.post('/user', {requiredPermission: "Create User"}).then(res=>{
@@ -55,9 +78,11 @@ export default class User extends React.Component {
             })
             const { tableData } = this.state;
             tableData["data"] = datalist;
-            this.setState({ tableData });
+            this.setState({ tableData, loading: false});
         }).catch(err=>{
             console.log(err)
+            this.setState({loading: false});
+
         })
     }
     render(){
@@ -70,17 +95,10 @@ export default class User extends React.Component {
                   defaultSortField="id"
                   defaultSortAsc={true}
                   filterPlaceholder="Search"
-                  onSelectedRowsChange={(selected) => {
-                    
-                  }}
                   responsive
                   pagination
-                  selectableRows
-                  onRowClicked={(index) => {
-                    
-                  }}
-                  pointerOnHover
                   highlightOnHover
+                  progressPending={this.state.loading}
                 />
               </DataTableExtensions>
             </div>

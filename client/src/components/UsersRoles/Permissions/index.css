@@ -1,0 +1,53 @@
+.permission-row {
+    padding: 6px 0 4px;
+  }
+  .api-keys {
+    margin-bottom: 20px;
+  }
+  .permission-group {
+    margin-bottom: 30px;
+  }
+  .permission-parent-head {
+    margin-bottom: 15px;
+  }
+  .permission-parent-head h3 {
+    border-bottom: 1px solid #d2d6de;
+    padding-bottom: 5px;
+  }
+  .permission-group .btn-default{
+    background-color: #4e4fa1;
+    margin: 2px;
+    padding: 5px;
+    color: #fff;
+    font-size: 0.7em;
+  }
+  .permission-parent-actions {
+    margin-top: 0;
+  }
+  .permission-row .permission-label {
+    font-size: 0.8em;
+    font-weight: 500;
+    display: block;
+    padding-top: 4px;
+  }
+  .permission-row .radio-btn .radio {
+    float: right;
+    margin-left: 15px;
+  }
+  .permission-row .radio-btn .radio:last-child {
+    margin-left: 0;
+  }
+  #new_password .btn-reset-password {
+    margin: 10px 0 15px;
+  }
+  
+  @media screen and (max-width: 767px) {
+    .permission-row .radio-btn {
+      float: left;
+      margin-left: 15px;
+    }
+    .permission-group-actions {
+      margin-top: 10px;
+    }
+  }
+  
