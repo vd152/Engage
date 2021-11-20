@@ -5,6 +5,9 @@ html, body, #root {
     padding-left: 65px;
     padding-top: 50px;
 }
+.center-container-bottom{
+    padding-top: 50px;
+}
 .page-heading{
     padding: 0.5em;
     color: #4e4fa1;

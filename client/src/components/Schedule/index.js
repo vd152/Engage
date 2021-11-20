@@ -9,7 +9,7 @@ class Schedule extends React.Component {
   }
   render() {
     return (
-      <div className="center-container ">
+      <div className={window.innerHeight < window.innerWidth ? "center-container ": "center-container-bottom"}>
         <div className="d-flex justify-content-between">
           <h3 className="page-heading">My Schedule</h3>
           <div className="btn-container">

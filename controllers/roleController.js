@@ -47,7 +47,7 @@ exports.addRole = async(req, res) => {
      .then(role=>{
         return res.status(200).json({
             success: true, 
-            data: role
+            role
         })
      })
      .catch(err=>{
@@ -56,4 +56,20 @@ exports.addRole = async(req, res) => {
             message: "Something went wrong"
         })
      })
+}
+
+exports.deleteRole = async(req, res) => {
+    const id = req.body.id
+    Role.deleteOne({_id: id}).then(data=>{
+        return res.status(200).json({
+            success: true, 
+            data
+        })
+    }).catch((err) => {
+        return res.status(500).json({
+          success: false,
+          message: "something went wrong",
+        });
+      });
+
 }

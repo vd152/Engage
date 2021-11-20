@@ -5,7 +5,7 @@ import "react-data-table-component-extensions/dist/index.css";
 import api from "../../apis/api";
 import { format } from "timeago.js";
 import Modal from "../Modal";
-import {FaEdit,FaTrashAlt } from 'react-icons/fa'
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import Permission from "./Permissions";
 export default class Role extends React.Component {
   state = {
@@ -28,58 +28,71 @@ export default class Role extends React.Component {
           selector: (row) => row.created,
           sortable: true,
         },
-        { 
+        {
           name: "Edit",
           width: "60px",
-          cell: (row)=> <button className=" row-btn" onClick={(e)=>{e.preventDefault();
-            this.handleEdit(row)
-          }}><FaEdit /></button>
+          cell: (row) => (
+            <button
+              className=" row-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                this.handleEdit(row);
+              }}
+            >
+              <FaEdit />
+            </button>
+          ),
         },
-        { 
+        {
           name: "Delete",
           width: "60px",
-          cell: (row)=> <button className=" row-btn" onClick={(e)=>{e.preventDefault();
-            this.handleDelete(row)
-          }}><FaTrashAlt /></button>
-        }
+          cell: (row) => (
+            <button
+              className=" row-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                this.deleteRole(row._id);
+              }}
+            >
+              <FaTrashAlt />
+            </button>
+          ),
+        },
       ],
       data: [],
     },
     role: {
       name: "",
       permissions: [],
-    }
+    },
   };
   handleEdit = (row) => {
-    console.log(row)
-  }
-  handleDelete = (row) =>{
-
-  }
-  setVal =( val, permName) => {
-    const {role} = this.state
-      var flag = true;
-      const {permissions} = this.state.role
-      permissions.map((perm, index)=>{
-        if(perm['name'] == permName){
-          // Permissions.splice(perm, index)
-          perm['value'] = JSON.parse(val)
-          flag = false;
-        }
-      })
-      if(flag){
-        permissions.push({name: permName, value: JSON.parse(val)})
+    console.log(row);
+  };
+  setVal = (val, permName) => {
+    const { role } = this.state;
+    var flag = true;
+    const { permissions } = this.state.role;
+    permissions.map((perm, index) => {
+      if (perm["name"] == permName) {
+        // Permissions.splice(perm, index)
+        perm["value"] = JSON.parse(val);
+        flag = false;
       }
+    });
+    if (flag) {
+      permissions.push({ name: permName, value: JSON.parse(val) });
+    }
 
-    console.log(role)
-    this.setState({role})
-  }
+    console.log(role);
+    this.setState({ role });
+  };
   componentDidMount() {
-    this.setState({loading: true});
+    this.setState({ loading: true });
     const datalist = [];
     var i = 0;
     api
-      .post("/role", { requiredPermission: "Create User" })
+      .post("/role", { requiredPermission: "Create Roles" })
       .then((res) => {
         res.data.role.forEach((val) => {
           i++;
@@ -94,15 +107,27 @@ export default class Role extends React.Component {
         });
         const { tableData } = this.state;
         tableData["data"] = datalist;
-        this.setState({ tableData, loading: false});
+        this.setState({ tableData, loading: false });
       })
       .catch((err) => {
         console.log(err);
-        this.setState({loading: false});
-
+        this.setState({ loading: false });
       });
   }
-
+  createRole = () => {
+    api.post('/role/add', {name: this.state.role.name, permissions: this.state.role.permissions, requiredPermission: "Create Roles"}).then(res=>{
+      this.componentDidMount()
+    }).catch((err) =>{
+      console.log(err);
+    })
+  };
+  deleteRole = (id) => {
+    api.post('/role/delete', {id: id, requiredPermission: "Delete Roles"}).then(res=>{
+      this.componentDidMount()
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
   render() {
     return (
       <div>
@@ -126,34 +151,82 @@ export default class Role extends React.Component {
           />
         </DataTableExtensions>
         <Modal target="addrole" heading="Add Role">
-        <form>
+          <form>
             <div className="form-group">
               <label className="form-label">Name: </label>
               <input
                 className="form-control"
-                placeholder="Eg. Class22"
+                placeholder="Eg. admin"
                 type="text"
                 value={this.state.role.name}
-                onChange={(e)=>{
-                  const {role} = this.state;
+                onChange={(e) => {
+                  const { role } = this.state;
                   role.name = e.target.value;
-                  this.setState({role})
+                  this.setState({ role });
                 }}
               />
             </div>
 
             <div className="form-group py-2">
-            <label className="form-label">Permissions: </label>
-
-              <Permission 
-              heading="Users"
-              attributes={["Create", "Edit", "Delete"]}
-              suffix="Users"
-              setVal = {this.setVal}
-              editPermissions = {this.state.role.permissions}
+              <label className="form-label">Permissions: </label>
+              <Permission
+                heading="Users"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Users"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Roles"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Roles"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Groups"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Groups"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Forum Categories"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Categories"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Forum Topics"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Topics"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Forum Posts"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Posts"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Forum Comments"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Comments"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
               />
             </div>
-            <button className="btn btn-primary add-button mt-2" type="submit">
+            <button
+              className="btn btn-primary add-button mt-2"
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault()
+                this.createRole();
+              }}
+            >
               Add
             </button>
           </form>

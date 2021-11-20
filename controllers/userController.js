@@ -120,3 +120,18 @@ exports.getUser = async (req, res) => {
       });
     });
 };
+
+exports.deleteUser = async(req, res) => {
+  const id = req.body.id
+  User.deleteOne({_id: id}).then(data=>{
+      return res.status(200).json({
+          success: true, 
+          data
+      })
+  }).catch((err) => {
+      return res.status(500).json({
+        success: false,
+        message: "something went wrong",
+      });
+    });
+}

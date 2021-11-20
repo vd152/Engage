@@ -7,5 +7,7 @@ router.post('/', passport.authenticate('jwt',{session: false}), checkPermission,
 router.get('/:id', controller.getUser)
 router.post('/register', controller.registerUser);
 router.post('/login', controller.loginUser);
+router.post('/delete', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteUser);
+
 
 module.exports = router;

@@ -19,10 +19,11 @@ class Groups extends React.Component {
       .post("/group", {
         name: this.state.name,
         code: this.state.code,
-        requiredPermission: "Create Group",
+        requiredPermission: "Create Groups",
       })
       .then((res) => {
         console.log(res);
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -31,6 +32,7 @@ class Groups extends React.Component {
   joinGroup = () =>{
     api.post('/group/join', {code: this.state.join}).then(res=>{
       console.log(res);
+      window.location.reload();
     }).catch(err=>{
       console.log(err);
     })
@@ -38,7 +40,7 @@ class Groups extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <div className="center-container ">
+      <div className={window.innerHeight < window.innerWidth ? "center-container ": "center-container-bottom"}>
           <div className="d-flex justify-content-between">
             <h3 className="page-heading">My Groups</h3>
             <div className="btn-container">

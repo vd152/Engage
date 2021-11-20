@@ -64,7 +64,7 @@ export default class User extends React.Component {
       this.setState({loading: true})
         const datalist = []
         var i = 0
-        api.post('/user', {requiredPermission: "Create User"}).then(res=>{
+        api.post('/user', {requiredPermission: "Create Users"}).then(res=>{
             res.data.user.forEach(val=>{
                 i++;
                 let temp = {

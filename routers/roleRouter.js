@@ -4,6 +4,7 @@ var passport = require('passport');
 const checkPermission = require('../utils/checkPermission')
 
 router.post('/', passport.authenticate('jwt',{session: false}), checkPermission, controller.getRoles);
-router.post('/add', controller.addRole);
+router.post('/add',passport.authenticate('jwt',{session: false}), checkPermission, controller.addRole);
+router.post('/delete', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteRole);
 
 module.exports = router;

@@ -123,3 +123,65 @@ exports.joinGroup = async (req, res) => {
           });
     })
 };
+
+exports.leaveGroup = async (req, res) => {
+
+  const { code } = req.body;
+  if ( !code) {
+    return res.status(422).json({
+      success: false,
+      message: "Please fill all the required fields.",
+    });
+  }
+  let groupExists;
+  try {
+    groupExists = await Group.findOne({ code });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong.",
+    });
+  }
+  if (!groupExists) {
+    return res.status(400).json({
+      success: false,
+      message: "Group code does not exists",
+    });
+  }
+  let userfound = groupExists.users.indexOf(req.user._id);
+  if(userfound === -1) {
+      return res.status(400).json({
+          success: false,
+          message: "You are not a part of this group"
+      })
+  }
+  groupExists.users.splice(userfound, 1);
+  Group.findByIdAndUpdate(groupExists._id, groupExists, {new: true}).then(group=>{
+      User.findById(req.user._id)
+      .then((user) => {
+        user.groups.splice(user.groups.indexOf(group._id),1);
+        User.findByIdAndUpdate(req.user._id, user, { new: true })
+          .then((updatedUser) => {
+            console.log(updatedUser);
+            return res.status(200).json({
+                success: true,
+                message: "Group left"
+            })
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+          return res.status(500).json({
+              success: false,
+              message: "Something went wrong",
+            });
+      });
+  }).catch(err=>{
+      return res.status(500).json({
+          success: false,
+          message: "Something went wrong",
+        });
+  })
+};
