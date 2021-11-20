@@ -19,7 +19,21 @@ html, body, #root {
 .add-button:hover{
     background-color: #424492;
 }
-
+.view-button{
+    background-color: #72ce72;
+    color: #fff;
+    border: none ;
+    box-shadow: none
+}
+.leave-button{
+    background-color: #da6845;
+    color: #fff;
+    border: none ;
+    box-shadow: none
+}
+.view-button:hover, .leave-button:hover{
+    background-color: #424492;
+}
 .btn:focus{
     box-shadow:none !important;border: none;
     background-color: #424492;

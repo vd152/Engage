@@ -101,6 +101,11 @@ exports.getUser = async (req, res) => {
   let id = req.params.id;
   User.findById(id)
     .populate("role")
+    .populate("groups")
+    .populate({
+      path: "groups", 
+      populate: [{path: "createdBy", select: ["firstName", "lastName"]}]
+    })
     .select("-password")
     .then((user) => {
       return res.status(200).json({

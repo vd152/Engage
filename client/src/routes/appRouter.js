@@ -9,6 +9,8 @@ import { connect } from "react-redux";
 import {currentUser} from '../redux/actions/UserActions'
 import {getUser} from '../utils/localStorage'
 import Groups from "../components/Groups";
+import Schedule from "../components/Schedule";
+import Forum from "../components/Forum";
 class router extends React.Component {
   componentDidMount() {
     if(getUser())
@@ -21,8 +23,8 @@ class router extends React.Component {
         <PublicRoute exact path="/login" component={Auth} />
         <PrivateRoute exact path="/" component={Main} />
         <PrivateRoute exact path="/groups" component={Groups}/>
-        <PrivateRoute exact path="/schedule" component={Main}/>
-        <PrivateRoute exact path="/forum" component={Main}/>
+        <PrivateRoute exact path="/schedule" component={Schedule}/>
+        <PrivateRoute exact path="/forum" component={Forum}/>
         <PrivateRoute exact path="/user-role" component={UserRoles}/>
       </Switch>
     </Router>

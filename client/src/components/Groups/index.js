@@ -2,13 +2,39 @@ import React from "react";
 import Modal from "../Modal";
 import GroupTile from "./GroupTile";
 import "./index.css";
+import api from "../../apis/api";
+import { connect} from 'react-redux'
 class Groups extends React.Component {
   state = {
     name: "",
     code: "",
     join: "",
+    groups: []
   };
-  handleCreate = () => {};
+  componentDidMount() {
+
+  }
+  handleCreate = () => {
+    api
+      .post("/group", {
+        name: this.state.name,
+        code: this.state.code,
+        requiredPermission: "Create Group",
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  joinGroup = () =>{
+    api.post('/group/join', {code: this.state.join}).then(res=>{
+      console.log(res);
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
   render() {
     return (
       <React.Fragment>
@@ -33,11 +59,9 @@ class Groups extends React.Component {
             </div>
           </div>
           <div className="m-3 row align-items-center justify-content-center group-row">
-            <GroupTile />
-            <GroupTile />
-            <GroupTile />
-            <GroupTile />
-            <GroupTile />
+            {this.props.user?.groups?.map((group, key)=>{
+              return <GroupTile key={key} group={group}/>
+            })}
           </div>
         </div>
         <Modal target="joinmodal" heading="Join a Group">
@@ -52,7 +76,10 @@ class Groups extends React.Component {
                 onChange={(e) => this.setState({ join: e.target.value })}
               />
             </div>
-            <button className="btn btn-primary add-button mt-2" type="submit">
+            <button className="btn btn-primary add-button mt-2" onClick={(e)=>{
+              e.preventDefault();
+              this.joinGroup()
+            }}>
               Join
             </button>
           </form>
@@ -66,7 +93,7 @@ class Groups extends React.Component {
                 placeholder="Eg. Class 2022"
                 type="text"
                 value={this.state.name}
-                onChange={(e) => this.setState({ name: e.target.value })}
+                onChange={(e) => this.setState({ name: e.target.value.replace(/\s+/g, '-') })}
               />
             </div>
             <div className="form-group">
@@ -75,11 +102,17 @@ class Groups extends React.Component {
                 className="form-control"
                 placeholder="Eg. Class22"
                 type="text"
-                value={this.state.code}
-                onChange={(e) => this.setState({ code: e.target.value })}
+                value={this.state.code.toLowerCase()}
+                onChange={(e) => this.setState({ code: e.target.value.replace(/\s+/g, '-')})}
               />
             </div>
-            <button className="btn btn-primary add-button mt-2" type="submit">
+            <button
+              className="btn btn-primary add-button mt-2"
+              onClick={(e) => {
+                e.preventDefault()
+                this.handleCreate();
+              }}
+            >
               Create
             </button>
           </form>
@@ -89,4 +122,9 @@ class Groups extends React.Component {
   }
 }
 
-export default Groups;
+const mapStateToProps = (state) => {
+  return {
+    user: state.currentUser.user,
+  };
+};
+export default connect(mapStateToProps)(Groups);
