@@ -11,6 +11,7 @@ import {getUser} from '../utils/localStorage'
 import Groups from "../components/Groups";
 import Schedule from "../components/Schedule";
 import Forum from "../components/Forum";
+import Profile from "../components/Profile";
 class router extends React.Component {
   componentDidMount() {
     if(getUser())
@@ -26,6 +27,8 @@ class router extends React.Component {
         <PrivateRoute exact path="/schedule" component={Schedule}/>
         <PrivateRoute exact path="/forum" component={Forum}/>
         <PrivateRoute exact path="/user-role" component={UserRoles}/>
+        <PrivateRoute exact path="/profile" component={Profile}/>
+
       </Switch>
     </Router>
     )

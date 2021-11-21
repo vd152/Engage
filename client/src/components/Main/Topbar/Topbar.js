@@ -25,6 +25,7 @@ const Topbar = (props) => {
             placeholder="Search"
           />
         </div>
+        
         <div className="p-2 logout" onClick={(e)=>{
           removeAuthToken()
           removeUser()

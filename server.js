@@ -13,6 +13,7 @@ require('./config/passport')(passport);
 const userRouter = require('./routers/userRouter')
 const roleRouter = require('./routers/roleRouter')
 const groupRouter = require('./routers/groupRouter')
+const scheduleRouter = require('./routers/scheduleRouter')
 const PORT = 5000
 
 app.use(
@@ -44,6 +45,7 @@ mongoose
 app.use('/user', userRouter);
 app.use('/role', roleRouter);
 app.use('/group', groupRouter);
+app.use('/schedule', scheduleRouter);
 
 app.get("/abc", passport.authenticate('jwt',{session: false}), (req, res) =>{
   res.send("Hey");

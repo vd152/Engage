@@ -44,7 +44,11 @@ const userSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'groups'
       }
-    ]
+    ],
+    vaccinationStatus: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

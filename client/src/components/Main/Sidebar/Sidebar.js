@@ -43,7 +43,7 @@ class Sidebar extends React.Component {
             className="sideNavlink"
             onClick={(e) => {
               this.props.setActive("Groups");
-              this.setState({ url: "groups" });
+              this.setState({ url: "/groups" });
             }}
           >
             <div className={this.props.active === "Groups" ? "activeLink" : ""}>
@@ -69,7 +69,7 @@ class Sidebar extends React.Component {
             className="sideNavlink"
             onClick={(e) => {
               this.props.setActive("Schedule");
-              this.setState({ url: "schedule" });
+              this.setState({ url: "/schedule" });
             }}
           >
             <div
@@ -97,7 +97,7 @@ class Sidebar extends React.Component {
             className="sideNavlink"
             onClick={(e) => {
               this.props.setActive("Forum");
-              this.setState({ url: "forum" });
+              this.setState({ url: "/forum" });
             }}
           >
             <div className={this.props.active === "Forum" ? "activeLink" : ""}>
@@ -124,7 +124,7 @@ class Sidebar extends React.Component {
             className="sideNavlink"
             onClick={(e) => {
               this.props.setActive("Users");
-              this.setState({ url: "user-role" });
+              this.setState({ url: "/user-role" });
             }}
           >
             <div className={this.props.active === "Users" ? "activeLink" : ""}>
@@ -147,7 +147,32 @@ class Sidebar extends React.Component {
             </div>
           </div>
         </div>
-        <div></div>
+        <div
+            className="sideNavlink"
+            onClick={(e) => {
+              this.props.setActive("Profile");
+              this.setState({ url: "/profile" });
+            }}
+          >
+            <div className={this.props.active === "Profile" ? "activeLink" : ""}>
+              <img
+                alt="Profile"
+                className="currentSideBarIcon"
+                src={
+                  this.props.active === "Profile"
+                    ? "/assets/images/profile-hover.png"
+                    : "/assets/images/profile.png"
+                }
+              />
+            </div>
+            <div
+              className={
+                this.props.active === "Profile" ? "activeSideNavLink" : ""
+              }
+            >
+              Profile
+            </div>
+          </div>
       </div>
     );
   }
