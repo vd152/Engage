@@ -3,10 +3,12 @@ import thunk from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension'
 import { sidebarReducer } from './reducers/SidebarReducer'
 import { userReducer} from './reducers/UserReducer'
+import { categoryReducer} from './reducers/ForumReducer'
 
 const reducers = combineReducers({
     getActive: sidebarReducer,
-    currentUser: userReducer
+    currentUser: userReducer,
+    forumCategories: categoryReducer
 })
 
 const Store = createStore(

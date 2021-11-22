@@ -41,7 +41,7 @@ html, body, #root {
     box-shadow:none !important;border: none;
     background-color: #424492;
 }
-input:focus, input:active{
+input:focus, input:active, select:focus, select:active{
     box-shadow:none !important;
     
 }

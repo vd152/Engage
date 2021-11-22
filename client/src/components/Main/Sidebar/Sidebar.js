@@ -119,33 +119,35 @@ class Sidebar extends React.Component {
               Forum
             </div>
           </div>
+          {this.props.user?.role?.name === "admin" &&
 
           <div
             className="sideNavlink"
             onClick={(e) => {
-              this.props.setActive("Users");
-              this.setState({ url: "/user-role" });
+              this.props.setActive("Admin");
+              this.setState({ url: "/manage" });
             }}
           >
-            <div className={this.props.active === "Users" ? "activeLink" : ""}>
+            <div className={this.props.active === "Admin" ? "activeLink" : ""}>
               <img
                 className="currentSideBarIcon"
                 src={
-                  this.props.active === "Users"
+                  this.props.active === "Admin"
                     ? "/assets/images/user-roles-hover.png"
                     : "/assets/images/user-roles.png"
                 }
-                alt="UsersRoles"
+                alt="Admin"
               />
             </div>
             <div
               className={
-                this.props.active === "Users" ? "activeSideNavLink" : ""
+                this.props.active === "Admin" ? "activeSideNavLink" : ""
               }
             >
-              Users & Roles
+              Admin
             </div>
           </div>
+  }
         </div>
         <div
             className="sideNavlink"

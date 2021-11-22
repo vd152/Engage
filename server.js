@@ -14,6 +14,7 @@ const userRouter = require('./routers/userRouter')
 const roleRouter = require('./routers/roleRouter')
 const groupRouter = require('./routers/groupRouter')
 const scheduleRouter = require('./routers/scheduleRouter')
+const forumRouter = require('./routers/forumRouter')
 const PORT = 5000
 
 app.use(
@@ -46,6 +47,7 @@ app.use('/user', userRouter);
 app.use('/role', roleRouter);
 app.use('/group', groupRouter);
 app.use('/schedule', scheduleRouter);
+app.use('/forum', forumRouter);
 
 app.get("/abc", passport.authenticate('jwt',{session: false}), (req, res) =>{
   res.send("Hey");

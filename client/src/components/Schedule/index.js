@@ -1,5 +1,5 @@
 import React from "react";
-import { FaAngleDown, FaArrowUp } from "react-icons/fa";
+import { FaAngleDown } from "react-icons/fa";
 import { connect } from "react-redux";
 import Modal from "../Modal";
 import DateTimePicker from "react-datetime-picker";

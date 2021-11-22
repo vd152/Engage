@@ -5,6 +5,7 @@
     height: 50px;
     width: 100%;
     color: #fff;
+    z-index: 100;
     /* margin-bottom: 50px; */
     top: 0;
   }

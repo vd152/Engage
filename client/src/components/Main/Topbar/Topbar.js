@@ -18,13 +18,13 @@ const Topbar = (props) => {
             <div className="headBarMSTeams">M.E.</div>
           </div>
         )}
-        <div className="headBarSearch">
+        {/* <div className="headBarSearch">
           <input
             type="text"
             className="headerBarSearchInput"
             placeholder="Search"
           />
-        </div>
+        </div> */}
         
         <div className="p-2 logout" onClick={(e)=>{
           removeAuthToken()

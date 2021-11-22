@@ -1,0 +1,34 @@
+.filter-button-container, .filter-text{
+    width: auto
+}
+.filter-text{
+    font-weight: 200;
+}
+.filter-button{
+    font-weight: 500;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: none;
+}
+.filter-button:hover, .filter-button:focus{
+    color: #4e4fa1;
+}
+.post-row{
+    height:72vh;
+    overflow-y: scroll;
+}
+.post-row::-webkit-scrollbar{
+    width: 0.2em
+}
+.post-row::-webkit-scrollbar-thumb{
+    background-color: #4e4fa1;
+}
+.top-text{
+    color: #4e4fa1
+}
+.post-icon{
+    font-size:1.5em;
+    margin: 0.7em;
+    cursor: pointer;
+}
