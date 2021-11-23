@@ -28,7 +28,25 @@ class Forum extends React.Component {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Choose
+              Group
+              <FaAngleDown />
+            </button>
+            <ul
+              className="dropdown-menu dropdown-menu-dark"
+              aria-labelledby="dropdownMenuButton2"
+            >
+              <li>Item</li>
+            </ul>
+          </div>
+          <div className="dropdown  filter-button-container">
+            <button
+              className="filter-button dropdown-toggle p-2"
+              type="button"
+              id="dropdownMenuButton2"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Category
               <FaAngleDown />
             </button>
             <ul
@@ -46,7 +64,7 @@ class Forum extends React.Component {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Choose
+              Topic
               <FaAngleDown />
             </button>
             <ul
@@ -62,7 +80,51 @@ class Forum extends React.Component {
         <div className="row mx-0 mt-3 justify-content-center post-row">
           <PostTile />
         </div>
-        <Modal target="createpost" heading="Ask a Question/ Discuss"/>
+        <Modal target="createpost" heading="Ask a Question/ Discuss">
+        <form>
+        <div className="form-group">
+              <label className="form-label">Category: </label>
+              <select
+                className="form-control"
+                value={""}
+                onChange={(e) => {
+
+                }}
+              >
+                <option value="">Please select a category</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Topics: </label>
+              <select
+                className="form-control"
+                value={""}
+                onChange={(e) => {
+
+                }}
+              >
+                <option value="">Please select a topic</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Title/Question: </label>
+              <input
+                className="form-control"
+                placeholder="Eg. Class22"
+                type="text"
+                value={""}
+                onChange={(e) => {
+
+                }}
+              />
+            </div>
+            <button className="btn btn-primary add-button mt-2" onClick={(e)=>{
+              e.preventDefault();
+            }}>
+              Join
+            </button>
+          </form>
+        </Modal>
       </div>
     );
   }

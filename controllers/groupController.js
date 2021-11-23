@@ -1,7 +1,17 @@
 const Group = require("../models/groupModel");
 const User = require("../models/userModel");
-exports.getUserGroups = async (req, res) => {
-    
+exports.getGroups = async (req, res) => {
+    Group.find().then(groups=>{
+      return res.status(200).json({
+        success: true,
+        groups
+      })
+    }).catch(err=>{
+      return res.status(500).json({
+        success: false,
+        message: "something went wrong"
+      })
+    })
 };
 
 exports.addGroup = async (req, res) => {

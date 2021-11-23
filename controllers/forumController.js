@@ -1,7 +1,7 @@
 const Category = require("../models/categoryModel");
 
 exports.createCategory = async (req, res) => {
-  const { name } = req.body;
+  const { name, group } = req.body;
   if (!name) {
     return res.status(422).json({
       success: false,
@@ -31,6 +31,7 @@ exports.createCategory = async (req, res) => {
     categoryType: "root",
     createdBy: req.user._id,
     parentCategory: null,
+    group
   });
 
   category
@@ -49,7 +50,7 @@ exports.createCategory = async (req, res) => {
     });
 };
 exports.getAllCategories = async(req, res) => {
-  Category.find({categoryType: "root"})    
+  Category.find({categoryType: "root"}).populate("group")    
   .then((categories) => {
     res.status(200).json({
       success: true,

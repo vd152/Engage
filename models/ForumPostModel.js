@@ -20,6 +20,10 @@ const postSchema = new mongoose.Schema(
         type: String,
         required: true,
     },
+    group: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'groups',
+    },
     likes: [
         {
             type: mongoose.Schema.Types.ObjectId,

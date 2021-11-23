@@ -26,6 +26,11 @@ import {connect } from "react-redux"
           sortable: true,
         },
         {
+          name: "Group",
+          selector: (row) => row.group,
+          sortable: true,
+        },
+        {
           name: "Created",
           selector: (row) => row.created,
           sortable: true,
@@ -77,6 +82,11 @@ import {connect } from "react-redux"
             sortable: true,
           },
           {
+            name: "Category",
+            selector: (row) => row.category,
+            sortable: true,
+          },
+          {
             name: "Created",
             selector: (row) => row.created,
             sortable: true,
@@ -115,9 +125,11 @@ import {connect } from "react-redux"
         data: [],
     },
     catName: "",
+    group: "",
     topicName: "",
     selectedCategory: "",
-    allCategories: []
+    allCategories: [],
+    allgroups: []
   };
   componentDidMount() {
       this.setState({loading1: true, loading2: true});
@@ -130,6 +142,7 @@ import {connect } from "react-redux"
             let temp = {
               id: i,
               name: val.name,
+              group: val.group?.name?val.group?.name:"General",
               _id: val._id,
               created: format(val.createdAt),
             };
@@ -153,6 +166,7 @@ import {connect } from "react-redux"
             let temp = {
               id: i,
               name: val.name,
+              category: val.parentCategory?.name,
               _id: val._id,
               created: format(val.createdAt),
             };
@@ -166,9 +180,15 @@ import {connect } from "react-redux"
           console.log(err)
           this.setState({loading2: false})
       })
+
+      api.get('/group').then(res=>{
+        this.setState({allgroups : res.data?.groups})
+      }).catch(err=>{
+        console.log(err)
+      })
   }
   createCategory = () => {
-      api.post('/forum/category', {name: this.state.catName, requiredPermission: "Create Categories"}).then(res=>{
+      api.post('/forum/category', {name: this.state.catName, group: this.state.group == ""?null:this.state.group, requiredPermission: "Create Categories"}).then(res=>{
           console.log(res)
       }).catch(err=>{
           console.log(err)
@@ -225,6 +245,15 @@ import {connect } from "react-redux"
         </DataTableExtensions>
         <Modal target="addcat" heading="Add a Forum Category">
         <form>
+          <div className="form-group">
+            <label className="form-label">Group: </label>
+            <select className="form-control" value={this.state.group} onChange={(e)=>{this.setState({group: e.target.value})}}>
+              <option value="">Please select a group</option>
+              {this.state.allgroups.map((group, key)=>{
+                return <option value={group._id} key={key}>{group.name}</option>
+              })}
+            </select>
+          </div>
             <div className="form-group">
               <label className="form-label">Name: </label>
               <input

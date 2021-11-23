@@ -19,7 +19,11 @@ const categorySchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "categories",
         default: null,
-      },
+    },
+    group:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'groups',
+    }
   },
   { timestamps: true }
 );
