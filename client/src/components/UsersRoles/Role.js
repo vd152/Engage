@@ -51,7 +51,7 @@ export default class Role extends React.Component {
               className=" row-btn"
               onClick={(e) => {
                 e.preventDefault();
-                this.deleteRole(row._id);
+                this.deleteRole(row);
               }}
             >
               <FaTrashAlt />
@@ -69,6 +69,7 @@ export default class Role extends React.Component {
   handleEdit = (row) => {
     console.log(row);
   };
+
   setVal = (val, permName) => {
     const { role } = this.state;
     var flag = true;
@@ -121,8 +122,8 @@ export default class Role extends React.Component {
       console.log(err);
     })
   };
-  deleteRole = (id) => {
-    api.post('/role/delete', {id: id, requiredPermission: "Delete Roles"}).then(res=>{
+  deleteRole = (row) => {
+    api.post('/role/delete', {id: row._id, requiredPermission: "Delete Roles"}).then(res=>{
       this.componentDidMount()
     }).catch(err=>{
       console.log(err);

@@ -56,10 +56,10 @@ import {connect } from "react-redux"
           cell: (row) => (
             <button
               className=" row-btn"
-              //   onClick={(e) => {
-              //     e.preventDefault();
-              //     this.deleteRole(row._id);
-              //   }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.handleDelete(row);
+                }}
             >
               <FaTrashAlt />
             </button>
@@ -112,10 +112,10 @@ import {connect } from "react-redux"
             cell: (row) => (
               <button
                 className=" row-btn"
-                //   onClick={(e) => {
-                //     e.preventDefault();
-                //     this.deleteRole(row._id);
-                //   }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.handleDelete(row);
+                  }}
               >
                 <FaTrashAlt />
               </button>
@@ -144,6 +144,7 @@ import {connect } from "react-redux"
               name: val.name,
               group: val.group?.name?val.group?.name:"General",
               _id: val._id,
+              type: val.categoryType,
               created: format(val.createdAt),
             };
             datalist.push(temp);
@@ -186,6 +187,14 @@ import {connect } from "react-redux"
       }).catch(err=>{
         console.log(err)
       })
+  }
+  handleDelete = (row) => {
+    api.post('/forum/delete/category', {id: row._id, requiredPermission: row.type === "root"?"Delete Categories": "Delete Topics"}).then(res=>{
+      console.log(res)
+      this.componentDidMount()
+    }).catch(err => {
+      console.log(err)
+    })
   }
   createCategory = () => {
       api.post('/forum/category', {name: this.state.catName, group: this.state.group == ""?null:this.state.group, requiredPermission: "Create Categories"}).then(res=>{

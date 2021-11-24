@@ -10,6 +10,8 @@ import api from "../../apis/api";
 import {setActive} from '../../redux/actions/SidebarActions'
 class Schedule extends React.Component {
   state = {
+    selectedSchedule: "",
+    mode: "online",
     loading: false,
     selectedGroupName: "",
     selectedGroup: {},
@@ -41,12 +43,19 @@ class Schedule extends React.Component {
               className="row-btn"
               data-bs-toggle="modal"
               data-bs-target={row.mode == "owner"?"#viewvotes": "#castvote"}
+              onClick={(e) => {
+                this.setState({selectedSchedule: row._id},()=>{
+                  if(row.mode === "owner") this.getVotes()
+                })
+              }}
             >{row.mode == "owner"? "View Selections": "Select Mode"}</button>
           ),
         },
       ],
       data: [],
     },
+    offlinevotes: [],
+    onlinevotes: []
   };
   componentDidMount() {
     if(this.props.location.groupid){
@@ -84,10 +93,10 @@ class Schedule extends React.Component {
           let temp = {
             from: new Date(val.from).toLocaleDateString("en-GB") + " " +new Date(val.from).toLocaleTimeString('en-US', { hour: 'numeric',minute: 'numeric', hour12: true }),
             to: new Date(val.to).toLocaleDateString("en-GB") + " " +new Date(val.to).toLocaleTimeString('en-US', { hour: 'numeric',minute: 'numeric', hour12: true }),
-            _id: val._id,
+            _id: val?._id,
             createdBy: val.createdBy?.firstName + " " + val.createdBy?.lastName,
           };
-          if(val.createdBy._id == this.props.user._id){
+          if(val.createdBy?._id == this.props.user?._id){
             temp.mode = "owner"
           }
           datalist.push(temp);
@@ -101,6 +110,20 @@ class Schedule extends React.Component {
         this.setState({ loading: false });
       });
   };
+  vote = () => {
+    api.post('/schedule/vote', {id: this.state.selectedSchedule, mode: this.state.mode}).then(res=>{
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+  getVotes = () => {
+    api.post('/schedule/vote/get', {id: this.state.selectedSchedule}).then(res=>{
+      this.setState({offlinevotes: res.data?.offline, onlinevotes: res.data?.online})
+    }).catch((err=>{
+      console.log(err)
+    }))
+  }
   render() {
     return (
       <div
@@ -220,8 +243,48 @@ class Schedule extends React.Component {
             </button>
           </form>
         </Modal>
-        <Modal target="viewvotes" heading="Class Mode Selections"></Modal>
-        <Modal target="castvote" heading="Select Class Mode"></Modal>
+        <Modal target="viewvotes" heading="Class Mode Selections">
+          <div className="row  justify-content-between">
+            <div className="col-6 text-center">
+              <h6>Offline ({this.state.offlinevotes.length})</h6>
+              {this.state.offlinevotes?.map((vote,key)=>{
+                return <p key={key} >{vote.id?.firstName + " "+ vote.id?.lastName}</p>
+              })}
+            </div>
+            <div className="col-6 text-center">
+            <h6>Online ({this.state.onlinevotes.length})</h6>
+              {this.state.onlinevotes?.map((vote,key)=>{
+                return <p key={key} >{vote.id?.firstName + " "+ vote.id?.lastName}</p>
+              })}
+            </div>
+          </div>
+        </Modal>
+        <Modal target="castvote" heading="Select Class Mode">
+          
+          <form >
+            <div className="form-group">
+            <label className="form-label">choose mode: </label>
+
+              <select className="form-control"
+               value={this.state.mode} onChange={(e) =>{
+                this.setState({mode: e.target.value})
+               }}>
+                <option value="online">Online</option>
+                {this.props.user?.vaccinationStatus &&
+                <option value="offline">Offline</option>}
+              </select>
+            </div>
+            <button
+              className="btn btn-primary add-button mt-2"
+              onClick={(e) => {
+                e.preventDefault();
+                this.vote();
+              }}
+            >
+              Vote
+            </button>
+          </form>
+        </Modal>
       </div>
     );
   }

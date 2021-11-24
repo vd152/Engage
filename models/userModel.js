@@ -4,11 +4,9 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
     },
     lastName: {
       type: String,
-      required: true,
     },
     email: { 
       type: String,
@@ -21,7 +19,6 @@ const userSchema = new mongoose.Schema(
     },
     dob: {
       type: Date,
-      required: true,
     },
     enrollmentNumber: {
       type: String,
@@ -37,7 +34,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'roles'
+      ref: 'roles',
+      required: true
     },
     groups: [
       { 

@@ -14,5 +14,7 @@ router.get('/topic/:categoryid', passport.authenticate('jwt',{session: false}), 
 router.post('/post', passport.authenticate('jwt',{session: false}), checkPermission, controller.createPost)
 router.post('/post/filter', passport.authenticate('jwt',{session: false}), controller.getPostFilter)
 
+router.post('/delete/category', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteCategory);
+
 
 module.exports = router;
