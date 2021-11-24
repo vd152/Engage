@@ -3,8 +3,71 @@ import "./index.css";
 import { FaAngleDown } from "react-icons/fa";
 import PostTile from "./PostTile";
 import Modal from "../Modal";
-
+import { connect } from "react-redux";
+import api from "../../apis/api";
 class Forum extends React.Component {
+  state = {
+    selectedGroup: "none",
+    selectedGroupCategories: [],
+    selectedCategory: "",
+    selectedCategoryTopics: [],
+    selectedTopic: "",
+    title: "",
+    content: "",
+    filtergroup: "",
+    filtercategory: "",
+    filtertopic: "",
+    allCategories: [],
+    allTopics: [],
+    posts: []
+  };
+  componentDidMount() {
+    this.getCategories();
+    this.getPost()
+  }
+  getCategories = () => {
+    let url = "/forum/category/" + this.state.selectedGroup;
+    api
+      .get(url)
+      .then((res) => {
+        this.setState({ selectedGroupCategories: res.data.categories });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  getTopics = () => {
+    let url = "/forum/topic/" + this.state.selectedCategory;
+    api
+      .get(url)
+      .then((res) => {
+        this.setState({ selectedCategoryTopics: res.data.topics });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  createPost = () => {
+    api.post("/forum/post", {
+      group: this.state.selectedGroup == "" ? null : this.state.selectedGroup,
+      category: this.state.selectedCategory,
+      topic: this.state.selectedTopic,
+      title: this.state.title,
+      content: this.state.content,
+      requiredPermission: "Create Posts"
+    }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+  };
+  getPost = () => {
+    api.post('forum/post/filter', {group:this.state.filtergroup, category: this.state.filtercategory, topic: this.state.filtertopic}).then(res=>{
+      this.setState({posts: res.data?.posts});
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
   render() {
     return (
       <div
@@ -16,94 +79,140 @@ class Forum extends React.Component {
       >
         <h3 className="page-heading">Forum</h3>
         <div className="d-flex m-0 align-items-center p-1 justify-content-between px-md-3 px-2">
-            <button className="btn add-button"           data-bs-toggle="modal"
-          data-bs-target="#createpost">Create</button>
+          <button
+            className="btn add-button"
+            data-bs-toggle="modal"
+            data-bs-target="#createpost"
+          >
+            Create
+          </button>
           <div className="d-flex m-0 align-items-center justify-content-end">
-          <span className=" filter-text">Filter: </span>
-          <div className="dropdown  filter-button-container">
-            <button
-              className="filter-button dropdown-toggle p-2"
-              type="button"
-              id="dropdownMenuButton2"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Group
-              <FaAngleDown />
-            </button>
-            <ul
-              className="dropdown-menu dropdown-menu-dark"
-              aria-labelledby="dropdownMenuButton2"
-            >
-              <li>Item</li>
-            </ul>
+            <span className=" filter-text">Filter: </span>
+            <div className="dropdown  filter-button-container">
+              <button
+                className="filter-button dropdown-toggle p-2"
+                type="button"
+                id="dropdownMenuButton2"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Group
+                <FaAngleDown />
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-dark"
+                aria-labelledby="dropdownMenuButton2"
+              >
+                {this.props.user?.groups?.map((group,key)=>{
+                  return <li key={key} className="dropdown-item">{group.name}</li>
+                })}
+              </ul>
+            </div>
+            <div className="dropdown  filter-button-container">
+              <button
+                className="filter-button dropdown-toggle p-2"
+                type="button"
+                id="dropdownMenuButton2"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Category
+                <FaAngleDown />
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-dark"
+                aria-labelledby="dropdownMenuButton2"
+              >
+                <li>Item</li>
+              </ul>
+            </div>
+            <div className="dropdown filter-button-container">
+              <button
+                className=" filter-button dropdown-toggle p-2"
+                type="button"
+                id="dropdownMenuButton2"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Topic
+                <FaAngleDown />
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-dark"
+                aria-labelledby="dropdownMenuButton2"
+              >
+                <li>Item</li>
+              </ul>
+            </div>
           </div>
-          <div className="dropdown  filter-button-container">
-            <button
-              className="filter-button dropdown-toggle p-2"
-              type="button"
-              id="dropdownMenuButton2"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Category
-              <FaAngleDown />
-            </button>
-            <ul
-              className="dropdown-menu dropdown-menu-dark"
-              aria-labelledby="dropdownMenuButton2"
-            >
-              <li>Item</li>
-            </ul>
-          </div>
-          <div className="dropdown filter-button-container">
-            <button
-              className=" filter-button dropdown-toggle p-2"
-              type="button"
-              id="dropdownMenuButton2"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Topic
-              <FaAngleDown />
-            </button>
-            <ul
-              className="dropdown-menu dropdown-menu-dark"
-              aria-labelledby="dropdownMenuButton2"
-            >
-              <li>Item</li>
-            </ul>
-          </div>
-          </div>
-          
         </div>
         <div className="row mx-0 mt-3 justify-content-center post-row">
-          <PostTile />
+          {this.state.posts.map((post,key)=>{
+
+          return <PostTile post={post} key={key}/>
+          })}
         </div>
         <Modal target="createpost" heading="Ask a Question/ Discuss">
-        <form>
-        <div className="form-group">
+          <form>
+            <div className="form-group">
+              <label className="form-label">Group: </label>
+              <select
+                className="form-control"
+                value={this.state.selectedGroup}
+                onChange={(e) => {
+                  this.setState({ selectedGroup: e.target.value }, () =>
+                    this.getCategories()
+                  );
+                }}
+              >
+                <option value="none">Please select a group</option>
+                {this.props.user?.groups?.map((group, key) => {
+                  return (
+                    <option value={group._id} key={key}>
+                      {group.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="form-group">
               <label className="form-label">Category: </label>
               <select
                 className="form-control"
-                value={""}
+                value={this.state.selectedCategory}
                 onChange={(e) => {
-
+                  this.setState({ selectedCategory: e.target.value }, () =>
+                    this.getTopics()
+                  );
                 }}
               >
                 <option value="">Please select a category</option>
+                {this.state.selectedGroupCategories.map((category, key) => {
+                  return (
+                    <option value={category._id} key={key}>
+                      {category.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div className="form-group">
               <label className="form-label">Topics: </label>
               <select
                 className="form-control"
-                value={""}
+                value={this.state.selectedTopic}
                 onChange={(e) => {
-
+                  this.setState({ selectedTopic: e.target.value})
                 }}
               >
                 <option value="">Please select a topic</option>
+                {this.state.selectedCategoryTopics?.map((topic, key) => {
+                  return (
+                    <option value={topic._id} key={key}>
+                      {topic.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div className="form-group">
@@ -112,15 +221,31 @@ class Forum extends React.Component {
                 className="form-control"
                 placeholder="Eg. Class22"
                 type="text"
-                value={""}
+                value={this.state.title}
                 onChange={(e) => {
-
+                  this.setState({ title: e.target.value });
                 }}
               />
             </div>
-            <button className="btn btn-primary add-button mt-2" onClick={(e)=>{
-              e.preventDefault();
-            }}>
+            <div className="form-group">
+              <label className="form-label">Content: </label>
+              <textarea
+                className="form-control"
+                placeholder="Eg. Class22"
+                type="text"
+                value={this.state.content}
+                onChange={(e) => {
+                  this.setState({ content: e.target.value });
+                }}
+              />
+            </div>
+            <button
+              className="btn btn-primary add-button mt-2"
+              onClick={(e) => {
+                e.preventDefault();
+                this.createPost();
+              }}
+            >
               Join
             </button>
           </form>
@@ -129,4 +254,9 @@ class Forum extends React.Component {
     );
   }
 }
-export default Forum;
+const mapStateToProps = (state) => {
+  return {
+    user: state.currentUser.user,
+  };
+};
+export default connect(mapStateToProps)(Forum);

@@ -32,3 +32,6 @@
     margin: 0.7em;
     cursor: pointer;
 }
+.dropdown-item{
+    cursor: pointer;
+}

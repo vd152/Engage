@@ -8,7 +8,23 @@ exports.createSchedule = async (req, res) => {
       message: "Please fill all the required fields.",
     });
   }
+  let scheduleFound;
+  try{
+    scheduleFound = await Schedule.findOne({from: {$lte: to}, to: {$gte: from}});
+  }catch(err){
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong"
+    })
+  }
 
+  if(scheduleFound){
+    return res.status(400).json({
+      success: false,
+      message: "Schedule is being overlapped",
+    });
+  }
+  
   let users = [];
   let createdBy = req.user._id;
   const schedule = new Schedule({
