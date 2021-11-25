@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "dependencies": {
     "axios": "^0.21.1",
-    "crypto-ld": "^6.0.0",
-    "jsonld-signatures": "^9.3.0",
-    "jszip": "^3.7.1",
+    "jsonld-signatures": "^6.0.0",
+    "crypto-ld": "^3.7.0",
+    "jszip": "^3.5.0",
     "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-data-table-component": "^7.4.5",

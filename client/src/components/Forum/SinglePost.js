@@ -1,14 +1,138 @@
 import React from "react";
-
+import { FaComment, FaThumbsUp } from "react-icons/fa";
+import { format } from "timeago.js";
+import { connect } from "react-redux";
+import api from '../../apis/api'
 class SinglePost extends React.Component {
-    render() {
-        return (
-            
-            <div><button onClick={(e) => {
+    state={
+        content: "", 
+        comments: []
+    }
+    componentDidMount(){
+        this.getComments()
+    }
+    likeTogglePost = () => {
+        api.post('/forum/post/like', {id: this.props.post?._id}).then(res=>{
+          this.props.refresh()
+        }).catch(err => {
+          console.log(err)
+        })
+      };
+    getComments = () => {
+        let url = '/forum/post/comment/'+this.props.post?._id
+        api.post(url).then(res=>{
+            this.setState({comments: res.data?.comments})
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+postComment = () => {
+    api.post('/forum/post/comment', {id: this.props.post?._id, content: this.state.content, requiredPermission: "Create Comments"}).then(res=>{
+        this.getComments()
+        this.setState({content: ""})
+    }).catch(err => {
+        console.log(err)
+    })
+}
+  render() {
+    return (
+      <>
+        <div className="row justify-content-center m-0">
+          <div className="col-md-9">
+            <button
+              className="btn btn-dark"
+              onClick={(e) => {
                 e.preventDefault();
                 this.props.back("");
-              }}>Back</button></div>
-        )
-    }
+              }}
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+
+        <div className="row mx-0 mt-3 justify-content-center post-row">
+          <div
+            className="col-md-9 col-10 row  border  overflow-hidden flex-md-row mb-4  h-md-250 position-relative"
+            style={{ height: "fit-content" }}
+          >
+            <div className="col p-4 d-flex flex-column position-static">
+              <strong className="d-inline-block mb-2 top-text">
+                {this.props.post?.category?.name} &gt;{" "}
+                {this.props.post?.topic?.name}
+              </strong>
+              <h3 className="mb-0">{this.props.post?.title}</h3>
+              <div className="mb-1 text-muted">
+                {format(this.props.post?.createdAt)}
+              </div>
+              <p className="mb-auto">{this.props.post?.content}</p>
+              <div className="mb-1 text-muted">
+                Posted by:{" "}
+                {this.props.post.createdBy?.firstName +
+                  " " +
+                  this.props.post.createdBy?.lastName + " - " + this.props.post.createdBy?.email} 
+              </div>
+            </div>
+            <div className="col-auto d-flex flex-column align-items-center justify-content-center">
+              <FaThumbsUp
+                className="post-icon"
+                style={{
+                  color: this.props.post?.likes?.includes(this.props.user._id)
+                    ? "red"
+                    : "black",
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.likeTogglePost();
+                }}
+              />
+            </div>
+            <hr />
+            <div className="comment-section my-2">
+              <form>
+                <div className="form-group">
+                  <label className="form-label">Share your views: </label>
+                  <textarea
+                    type="text"
+                    className="form-control"
+                    placeholder="Start typing..."
+                    value={this.state.content}
+                    onChange={(e) => {this.setState({content: e.target.value})}}
+                  />
+                </div>
+                <div className="row m-0 justify-content-end">
+                  <button
+                    className="btn btn-primary add-button mt-2 "
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.postComment()
+                    }}
+                  >
+                    Post Comment
+                  </button>
+                </div>
+              </form>
+              <hr />
+              <div className="row ">
+                  {this.state.comments.map((comment, key) =>{
+                      return  <div className="col-12 comment-bg" key={key}>
+                      <p className=" m-0">{comment.user?.firstName + " " + comment.user?.lastName + " " + comment.user?.email} - <span className="text-muted">{format(comment.createdAt)}</span></p>
+                      <p className="m-0">{comment.content}</p>
+                  </div>
+                  })}
+                 
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 }
-export default SinglePost;
+const mapStateToProps = (state) => {
+  return {
+    user: state.currentUser.user,
+  };
+};
+export default connect(mapStateToProps)(SinglePost);

@@ -108,6 +108,7 @@ class Forum extends React.Component {
                 className="dropdown-menu dropdown-menu-dark"
                 aria-labelledby="dropdownMenuButton2"
               >
+                <li  className="dropdown-item">Select</li>
                 {this.props.user?.groups?.map((group,key)=>{
                   return <li key={key} className="dropdown-item">{group.name}</li>
                 })}
@@ -121,6 +122,7 @@ class Forum extends React.Component {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
+                
                 Category
                 <FaAngleDown />
               </button>
@@ -128,6 +130,7 @@ class Forum extends React.Component {
                 className="dropdown-menu dropdown-menu-dark"
                 aria-labelledby="dropdownMenuButton2"
               >
+                <li  className="dropdown-item">Select</li>
                 <li>Item</li>
               </ul>
             </div>
@@ -146,6 +149,7 @@ class Forum extends React.Component {
                 className="dropdown-menu dropdown-menu-dark"
                 aria-labelledby="dropdownMenuButton2"
               >
+                <li  className="dropdown-item">Select</li>
                 <li>Item</li>
               </ul>
             </div>
@@ -157,7 +161,7 @@ class Forum extends React.Component {
 
           return <PostTile post={post} key={key} refresh={this.getPost} viewPost={this.setSingle}/>
           })}
-        </div>: <SinglePost back={this.setSingle}/>}
+        </div>: <SinglePost back={this.setSingle} post={this.state.singlePost} refresh={this.getPost}/>}
         <Modal target="createpost" heading="Ask a Question/ Discuss">
           <form>
             <div className="form-group">

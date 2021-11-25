@@ -14,6 +14,10 @@ router.get('/topic/:categoryid', passport.authenticate('jwt',{session: false}), 
 router.post('/post', passport.authenticate('jwt',{session: false}), checkPermission, controller.createPost)
 router.post('/post/filter', passport.authenticate('jwt',{session: false}), controller.getPostFilter)
 router.post('/post/like', passport.authenticate('jwt',{session: false}), controller.likeForumPost)
+router.post('/post/comment', passport.authenticate('jwt',{session: false}), checkPermission, controller.createComment)
+router.post('/post/comment/:postid', passport.authenticate('jwt',{session: false}), controller.getCommentsByPost)
+
+
 
 router.post('/delete/category', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteCategory);
 

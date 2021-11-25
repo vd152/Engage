@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path')
 const cookieSession = require("cookie-session");
+var cors = require('cors')
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(
     keys: ["key1", "key2"],
   })
 );
+app.use(cors())
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());

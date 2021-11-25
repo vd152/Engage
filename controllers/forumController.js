@@ -1,6 +1,6 @@
 const Category = require("../models/categoryModel");
 const Post = require("../models/forumPostModel");
-
+const Comment = require("../models/commentModel");
 exports.createCategory = async (req, res) => {
   const { name, group } = req.body;
   if (!name) {
@@ -173,7 +173,12 @@ exports.getTopicsByCategory = async (req, res) => {
 exports.createPost = async (req, res) => {
   const { group, category, topic, title, content } = req.body;
   let createdBy = req.user._id;
-
+  if(!category || !topic || !title || !content) {
+    return res.status(422).json({
+      success: false,
+      message: "Please fill all the required fields."
+    })
+  }
   const post = new Post({
     group,
     category,
@@ -228,6 +233,12 @@ exports.getPostFilter = async (req, res) => {
 
 exports.deleteCategory = async (req, res) => {
   const { id } = req.body;
+  if(!id){
+    return res.status(422).json({
+      success: false,
+      message: "Invalid request"
+    })
+  }
   Category.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({
@@ -245,7 +256,12 @@ exports.deleteCategory = async (req, res) => {
 
 exports.likeForumPost = async (req, res) => {
   const {id} = req.body;
-
+  if(!id){
+    return res.status(422).json({
+      success: false,
+      message: "Invalid request."
+    })
+  }
   Post.findOne({_id: id}).then((post) => {
     if(post.likes.includes(req.user._id)){
       post.likes.splice(post.likes.indexOf(req.user._id), 1);
@@ -268,6 +284,50 @@ exports.likeForumPost = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "something went wrong",
+    })
+  })
+}
+
+exports.createComment = async(req, res) => {
+    const {id, content} = req.body
+    if(!id || !content) return res.status(422).json({
+      success: false,
+      message: "Invalid or incomplete data.",
+    })
+
+    const comment = new Comment({user: req.user._id, content: content, post: id});
+
+    comment
+      .save()
+      .then(newcomment=>{
+        return res.status(200).json({
+          success: true,
+          comment: newcomment
+        })
+      })
+      .catch(err=>{
+        return res.status(500).json({
+          success: false,
+          message: "Something went wrong",
+        })
+      })
+}
+
+exports.getCommentsByPost = async(req, res) => {
+  const {postid} = req.params
+
+  Comment.find({post: postid})
+  .populate({path:'user', select: ["firstName", "lastName", "email", "enrollmentNumber"]})
+  .then(comments=>{
+    return res.status(200).json({
+      sucsess: true,
+      comments
+    })
+  }).catch(err=>{
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
     })
   })
 }

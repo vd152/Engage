@@ -41,7 +41,7 @@ class PostTile extends React.Component {
           />
           <FaComment className="post-icon" onClick={(e) => {
               e.preventDefault();
-              this.props.viewPost(this.props.post?._id);
+              this.props.viewPost(this.props.post);
             }}/>
         </div>
       </div>
