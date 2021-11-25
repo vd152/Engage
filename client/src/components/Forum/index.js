@@ -5,6 +5,7 @@ import PostTile from "./PostTile";
 import Modal from "../Modal";
 import { connect } from "react-redux";
 import api from "../../apis/api";
+import SinglePost from "./SinglePost";
 class Forum extends React.Component {
   state = {
     selectedGroup: "none",
@@ -19,7 +20,8 @@ class Forum extends React.Component {
     filtertopic: "",
     allCategories: [],
     allTopics: [],
-    posts: []
+    posts: [],
+    singlePost : "",
   };
   componentDidMount() {
     this.getCategories();
@@ -67,6 +69,9 @@ class Forum extends React.Component {
     }).catch(err=>{
       console.log(err);
     })
+  }
+  setSingle = (id) => {
+    this.setState({singlePost: id})
   }
   render() {
     return (
@@ -146,12 +151,13 @@ class Forum extends React.Component {
             </div>
           </div>
         </div>
+        {this.state.singlePost == ""? 
         <div className="row mx-0 mt-3 justify-content-center post-row">
           {this.state.posts.map((post,key)=>{
 
-          return <PostTile post={post} key={key}/>
+          return <PostTile post={post} key={key} refresh={this.getPost} viewPost={this.setSingle}/>
           })}
-        </div>
+        </div>: <SinglePost back={this.setSingle}/>}
         <Modal target="createpost" heading="Ask a Question/ Discuss">
           <form>
             <div className="form-group">

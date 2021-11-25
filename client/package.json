@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "dependencies": {
     "axios": "^0.21.1",
+    "crypto-ld": "^6.0.0",
+    "jsonld-signatures": "^9.3.0",
+    "jszip": "^3.7.1",
+    "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-data-table-component": "^7.4.5",
     "react-data-table-component-extensions": "^1.5.2",
@@ -17,7 +21,9 @@
     "redux-thunk": "^2.4.0",
     "styled-components": "^5.3.3",
     "timeago.js": "^4.0.2",
-    "web-vitals": "^1.1.0"
+    "vaccination-context": "^1.1.0",
+    "web-vitals": "^1.1.0",
+    "zbar.wasm": "^2.0.3"
   },
   "scripts": {
     "start": "react-scripts start",

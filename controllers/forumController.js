@@ -242,3 +242,32 @@ exports.deleteCategory = async (req, res) => {
       });
     });
 };
+
+exports.likeForumPost = async (req, res) => {
+  const {id} = req.body;
+
+  Post.findOne({_id: id}).then((post) => {
+    if(post.likes.includes(req.user._id)){
+      post.likes.splice(post.likes.indexOf(req.user._id), 1);
+    }else{
+      post.likes.push(req.user._id);
+    }
+    Post.findOneAndUpdate({_id: id}, {$set: {likes: post.likes}}, {new: true}).then((updated)=>{
+      return res.status(200).json({
+        success: true,
+        post: updated
+      })
+    }).catch((err) =>{
+      return res.status(500).json({
+        success: false,
+        message: "something went wrong",
+      })
+    })
+    
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "something went wrong",
+    })
+  })
+}

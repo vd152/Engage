@@ -1,7 +1,18 @@
 import React from "react";
 import { FaComment, FaThumbsUp } from "react-icons/fa";
 import { format } from "timeago.js";
+import api from "../../apis/api";
+import { connect} from 'react-redux'
+
 class PostTile extends React.Component {
+  likeTogglePost = () => {
+    api.post('/forum/post/like', {id: this.props.post?._id}).then(res=>{
+      this.props.refresh()
+    }).catch(err => {
+      console.log(err)
+    })
+  };
+
   render() {
     return (
       <div
@@ -20,11 +31,26 @@ class PostTile extends React.Component {
           <p className="mb-auto">{this.props.post?.content}</p>
         </div>
         <div className="col-auto d-flex flex-column align-items-center justify-content-center">
-          <FaThumbsUp className="post-icon" />
-          <FaComment className="post-icon" />
+          <FaThumbsUp
+            className="post-icon"
+            style={{color: this.props.post?.likes?.includes(this.props.user._id)?'red':"black"}}
+            onClick={(e) => {
+              e.preventDefault();
+              this.likeTogglePost();
+            }}
+          />
+          <FaComment className="post-icon" onClick={(e) => {
+              e.preventDefault();
+              this.props.viewPost(this.props.post?._id);
+            }}/>
         </div>
       </div>
     );
   }
 }
-export default PostTile;
+const mapStateToProps = (state) => {
+  return {
+    user: state.currentUser.user,
+  };
+};
+export default connect(mapStateToProps)(PostTile);
