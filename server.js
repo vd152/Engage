@@ -16,7 +16,7 @@ const roleRouter = require('./routers/roleRouter')
 const groupRouter = require('./routers/groupRouter')
 const scheduleRouter = require('./routers/scheduleRouter')
 const forumRouter = require('./routers/forumRouter')
-const PORT = 5000
+const PORT = process.env.PORT || 5000
 
 app.use(
     express.urlencoded({
@@ -51,13 +51,10 @@ app.use('/group', groupRouter);
 app.use('/schedule', scheduleRouter);
 app.use('/forum', forumRouter);
 
-app.get("/abc", passport.authenticate('jwt',{session: false}), (req, res) =>{
-  res.send("Hey");
-})
-app.get('/', (req,res)=>{
-  console.log(req.user)
-    res.send("Hi there")
-})
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static('client/build'))
+}
+
 
 app.listen(PORT,()=>{
     console.log(`listening on port ${PORT}`)
