@@ -11,10 +11,6 @@ const groupSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    displayPicture: {
-        type: String,
-        default: null
-    },
     users: [
         {
             type: mongoose.Schema.Types.ObjectId,

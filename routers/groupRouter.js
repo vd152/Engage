@@ -8,5 +8,6 @@ router.post('/', passport.authenticate('jwt',{session: false}), checkPermission,
 router.post('/join', passport.authenticate('jwt',{session: false}), controller.joinGroup);
 router.post('/leave', passport.authenticate('jwt',{session: false}), controller.leaveGroup);
 router.post('/delete', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteGroup);
+router.put('/:id', passport.authenticate('jwt',{session: false}), checkPermission, controller.editGroup)
 
 module.exports = router;

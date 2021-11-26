@@ -22,7 +22,7 @@ const hasPermissions = async (req, res, next) => {
   if (await result(req.user.role, req.body.requiredPermission)) return next();
   else
     return res.status(401).json({
-      success: false,
+      
       message: "unauthorised",
     });
 };

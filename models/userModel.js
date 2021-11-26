@@ -28,10 +28,6 @@ const userSchema = new mongoose.Schema(
     contactNumber: {
       type: String,
     },
-    displayPicture: {
-      type: String,
-      default: null
-    },
     role: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'roles',

@@ -8,9 +8,12 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import api from "../../apis/api";
 import {setActive} from '../../redux/actions/SidebarActions'
+import Loader from "../Main/Loader";
+import { toast } from 'react-toastify';
 class Schedule extends React.Component {
   state = {
     selectedSchedule: "",
+    loader: false,
     mode: "online",
     loading: false,
     selectedGroupName: "",
@@ -44,6 +47,7 @@ class Schedule extends React.Component {
               data-bs-toggle="modal"
               data-bs-target={row.mode == "owner"?"#viewvotes": "#castvote"}
               onClick={(e) => {
+                e.preventDefault()
                 this.setState({selectedSchedule: row._id},()=>{
                   if(row.mode === "owner") this.getVotes()
                 })
@@ -67,6 +71,7 @@ class Schedule extends React.Component {
     }
   }
   createSchedule = () => {
+    this.setState({loader: true})
     api
       .post("/schedule", {
         from: this.state.from,
@@ -76,14 +81,19 @@ class Schedule extends React.Component {
         requiredPermission: "Create Schedule",
       })
       .then((res) => {
-        console.log(res);
+        this.handleSelect()
+        toast("Schedule created")
+        this.setState({loader: false})
       })
       .catch((err) => {
-        console.log(err.response?.data?.message);
+        toast.error(`${err.response?.data?.message}`);
+
+        this.setState({loader: false})
+
       });
   };
   handleSelect = () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, loader: true });
     const datalist = [];
     let url = "/schedule/" + this.state.selectedGroup._id;
     api
@@ -103,28 +113,40 @@ class Schedule extends React.Component {
         });
         const { tableData } = this.state;
         tableData["data"] = datalist;
-        this.setState({ tableData, loading: false });
+        this.setState({ tableData, loading: false, loader: false });
       })
       .catch((err) => {
-        console.log(err);
-        this.setState({ loading: false });
+        toast.error(`${err.response?.data?.message}`);
+
+        this.setState({ loading: false,loader: false });
       });
   };
   vote = () => {
+    this.setState({loader: true})
+
     api.post('/schedule/vote', {id: this.state.selectedSchedule, mode: this.state.mode}).then(res=>{
-      console.log(res)
+      toast("Voted successfully")
+      this.setState({loader: false})
+
     }).catch(err=>{
-      console.log(err)
+      toast.error(`${err.response?.data?.message}`);
+
+      this.setState({loader: false})
+
     })
   }
   getVotes = () => {
+
     api.post('/schedule/vote/get', {id: this.state.selectedSchedule}).then(res=>{
       this.setState({offlinevotes: res.data?.offline, onlinevotes: res.data?.online})
     }).catch((err=>{
-      console.log(err)
+      toast.error(`${err.response?.data?.message}`);
+
+
     }))
   }
   render() {
+    if(this.state.loader) return <Loader />
     return (
       <div
         className={
@@ -234,6 +256,7 @@ class Schedule extends React.Component {
             </div>
             <button
               className="btn btn-primary add-button mt-2"
+              data-bs-dismiss="modal"
               onClick={(e) => {
                 e.preventDefault();
                 this.createSchedule();
@@ -276,6 +299,7 @@ class Schedule extends React.Component {
             </div>
             <button
               className="btn btn-primary add-button mt-2"
+              data-bs-dismiss="modal"
               onClick={(e) => {
                 e.preventDefault();
                 this.vote();

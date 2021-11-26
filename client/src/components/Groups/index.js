@@ -4,17 +4,22 @@ import GroupTile from "./GroupTile";
 import "./index.css";
 import api from "../../apis/api";
 import { connect} from 'react-redux'
+import {currentUser} from '../../redux/actions/UserActions'
+import { toast } from 'react-toastify';
+import Loader from "../Main/Loader";
+
 class Groups extends React.Component {
   state = {
+    loading: false,
     name: "",
     code: "",
     join: "",
-    groups: []
+    groups: [],
+    id: ""
   };
-  componentDidMount() {
 
-  }
   handleCreate = () => {
+    this.setState({loading: true});
     api
       .post("/group", {
         name: this.state.name,
@@ -22,22 +27,58 @@ class Groups extends React.Component {
         requiredPermission: "Create Groups",
       })
       .then((res) => {
-        console.log(res);
-        window.location.reload();
+        toast("Group created successfully")
+        this.getGroups()
+        this.setState({loading: false})
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(`${err.response?.data?.message }`);
+        this.setState({loading: false})
       });
   };
   joinGroup = () =>{
+    this.setState({loading: true});
+
     api.post('/group/join', {code: this.state.join}).then(res=>{
-      console.log(res);
-      window.location.reload();
+      toast("Group joined")
+      this.getGroups()
+      this.setState({loading: false})
     }).catch(err=>{
-      console.log(err);
+      toast.error(`${err.response?.data?.message }`);
+      this.setState({loading: false})
     })
   }
+  getGroups = () =>{
+    this.props.currentUser(this.props.user._id)
+  }
+  setLoading = (value) =>{
+    this.setState({loading: value});
+  }
+  setEditStates = (name, code, id) => {
+    this.setState({name: name, code: code, id: id})
+  }
+  editGroup = () => {
+    let url = "/group/" + this.state.id;
+    api
+      .put(url, {
+        name: this.state.name,
+        code: this.state.code,
+        requiredPermission: "Edit Groups",
+      })
+      .then((res) => {
+        this.getGroups();
+        this.setLoading(false);
+        toast("Group edited successfully");
+      })
+      .catch((err) => {
+        this.getGroups();
+        toast.error(`${err.response?.data?.message}`);
+        this.setLoading(false);
+      });
+  };
+  
   render() {
+    if(this.state.loading) return <Loader />
     return (
       <React.Fragment>
       <div className={window.innerHeight < window.innerWidth ? "center-container ": "center-container-bottom"}>
@@ -62,7 +103,7 @@ class Groups extends React.Component {
           </div>
           <div className="m-3 row align-items-center justify-content-center group-row">
             {this.props.user?.groups?.map((group, key)=>{
-              return <GroupTile key={key} group={group} user={this.props.user}/>
+              return <GroupTile setEditStates={this.setEditStates} key={key} group={group} user={this.props.user} refresh={this.getGroups} setLoading={this.setLoading} id={key}/>
             })}
           </div>
         </div>
@@ -74,11 +115,11 @@ class Groups extends React.Component {
                 className="form-control"
                 placeholder="Eg. Class22"
                 type="text"
-                value={this.state.join}
+                value={this.state.join || ""}
                 onChange={(e) => this.setState({ join: e.target.value })}
               />
             </div>
-            <button className="btn btn-primary add-button mt-2" onClick={(e)=>{
+            <button className="btn btn-primary add-button mt-2" data-bs-dismiss="modal" onClick={(e)=>{
               e.preventDefault();
               this.joinGroup()
             }}>
@@ -94,7 +135,7 @@ class Groups extends React.Component {
                 className="form-control"
                 placeholder="Eg. Class 2022"
                 type="text"
-                value={this.state.name}
+                value={this.state.name || ""}
                 onChange={(e) => this.setState({ name: e.target.value.replace(/\s+/g, '-') })}
               />
             </div>
@@ -104,18 +145,57 @@ class Groups extends React.Component {
                 className="form-control"
                 placeholder="Eg. Class22"
                 type="text"
-                value={this.state.code.toLowerCase()}
+                value={this.state.code.toLowerCase() || ""}
                 onChange={(e) => this.setState({ code: e.target.value.replace(/\s+/g, '-')})}
               />
             </div>
             <button
               className="btn btn-primary add-button mt-2"
+              data-bs-dismiss="modal"
               onClick={(e) => {
                 e.preventDefault()
                 this.handleCreate();
               }}
             >
               Create
+            </button>
+          </form>
+        </Modal>
+        <Modal target="editmodal" heading="Edit Group" >
+          <form>
+            <div className="form-group">
+              <label className="form-label">Name: </label>
+              <input
+                className="form-control"
+                placeholder="Eg. Class 2022"
+                type="text"
+                value={this.state.name}
+                onChange={(e) =>
+                  this.setState({ name: e.target.value.replace(/\s+/g, "-") })
+                }
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Code: </label>
+              <input
+                className="form-control"
+                placeholder="Eg. Class22"
+                type="text"
+                value={this.state.code.toLowerCase()}
+                onChange={(e) =>
+                  this.setState({ code: e.target.value.replace(/\s+/g, "-") })
+                }
+              />
+            </div>
+            <button
+              className="btn btn-primary add-button mt-2"
+              data-bs-dismiss="modal"
+              onClick={(e) => {
+                e.preventDefault();
+                this.editGroup();
+              }}
+            >
+              Edit
             </button>
           </form>
         </Modal>
@@ -129,4 +209,4 @@ const mapStateToProps = (state) => {
     user: state.currentUser.user,
   };
 };
-export default connect(mapStateToProps)(Groups);
+export default connect(mapStateToProps, {currentUser})(Groups);

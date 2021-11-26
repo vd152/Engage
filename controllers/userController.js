@@ -6,13 +6,11 @@ exports.getUsers = async (req, res) => {
     .select("-password")
     .then((user) => {
       res.status(200).json({
-        success: true,
         user,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -22,7 +20,6 @@ exports.registerUser = async (req, res) => {
 
   if (!email || !password || !role) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -30,16 +27,13 @@ exports.registerUser = async (req, res) => {
   try {
     userExists = await User.findOne({ email });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
-      success: false,
       message: "Something went wrong.",
     });
   }
 
   if (userExists) {
     return res.status(400).json({
-      success: false,
       message: "User already exists",
     });
   }
@@ -49,15 +43,12 @@ exports.registerUser = async (req, res) => {
     .save()
     .then((user) => {
       return res.status(200).json({
-        success: true,
         user,
         token: util.generateToken(user._id),
       });
     })
     .catch((err) => {
-      console.log(err);
       return res.status(500).json({
-        success: false,
         message: "Something went wrong",
       });
     });
@@ -68,7 +59,6 @@ exports.loginUser = async (req, res) => {
 
   if (!email || !password) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -76,22 +66,18 @@ exports.loginUser = async (req, res) => {
   try {
     user = await User.findOne({ email });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
-      success: false,
       message: "Something went wrong",
     });
   }
 
   if (user && (await user.matchPassword(password))) {
     return res.status(200).json({
-      success: true,
       user: user,
       token: util.generateToken(user._id),
     });
   } else {
     res.status(400).json({
-      success: false,
       message: "Invalid email or password.",
     });
   }
@@ -103,15 +89,14 @@ exports.getUser = async (req, res) => {
     .populate("role")
     .populate("groups")
     .populate({
-      path: "groups", 
-      populate: [{path: "createdBy", select: ["firstName", "lastName"]}]
+      path: "groups",
+      populate: [{ path: "createdBy", select: ["firstName", "lastName"] }],
     })
     .select("-password")
     .then((user) => {
       return res.status(200).json({
-        success: true,
-        user
-      })
+        user,
+      });
     })
     .catch((err) => {
       return res.status(500).json({
@@ -121,121 +106,116 @@ exports.getUser = async (req, res) => {
     });
 };
 
-exports.deleteUser = async(req, res) => {
-  const id = req.body.id
-  User.deleteOne({_id: id}).then(data=>{
+exports.deleteUser = async (req, res) => {
+  const id = req.body.id;
+  User.deleteOne({ _id: id })
+    .then((data) => {
       return res.status(200).json({
-          success: true, 
-          data
-      })
-  }).catch((err) => {
+        data,
+      });
+    })
+    .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
-}
+};
 
-exports.editUser = async(req, res) => {
-  const {user} = req.body
-  const id = req.params.id
-  if(!user || !user.email || !user.enrollmentNumber){
+exports.editUser = async (req, res) => {
+  const { user } = req.body;
+  const id = req.params.id;
+  if (!user || !user.email || !user.enrollmentNumber) {
     return res.status(422).json({
-      success: false,
-      message: "Please fill required fields"
-    })
+      message: "Please fill required fields",
+    });
   }
   let foundUser;
-  try{
-    foundUser = await User.findOne({_id: id})
-  }catch(err){
-    
+  try {
+    foundUser = await User.findOne({ _id: id });
+  } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong",
-    })
+    });
   }
-  if(!foundUser){
+  if (!foundUser) {
     return res.status(404).json({
-      success: false,
-      message: "User not found."
-    })
+      message: "User not found.",
+    });
   }
 
-  let newUser = {foundUser, ...user}
-  User.findOneAndUpdate({_id: id}, {$set: newUser}, {new: true})
-  .select("-password")
-  .then(updateduser=>{
-    return res.status(200).json({
-      success: true,
-      user: updateduser
+  let newUser = { foundUser, ...user };
+  User.findOneAndUpdate({ _id: id }, { $set: newUser }, { new: true })
+    .select("-password")
+    .then((updateduser) => {
+      return res.status(200).json({
+        user: updateduser,
+      });
     })
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "something went wrong"
-    })
-  })
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
 
 exports.editUserAdmin = async (req, res) => {
-  const {role} = req.body
-  const id = req.params.id
-  
+  const { role } = req.body;
+  const id = req.params.id;
+
   let foundUser;
-  try{
-    foundUser = await User.findOne({_id: id})
-  }catch(err){
-    
+  try {
+    foundUser = await User.findOne({ _id: id });
+  } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong",
-    })
+    });
   }
-  if(!foundUser){
+  if (!foundUser) {
     return res.status(404).json({
-      success: false,
-      message: "User not found."
-    })
+      message: "User not found.",
+    });
   }
-  foundUser.role = role
-  User.findOneAndUpdate({_id: id}, {$set: foundUser}, {new: true})
-  .select("-password")
-  .then(updateduser=>{
-    return res.status(200).json({
-      success: true,
-      user: updateduser
+  foundUser.role = role;
+  User.findOneAndUpdate({ _id: id }, { $set: foundUser }, { new: true })
+    .select("-password")
+    .then((updateduser) => {
+      return res.status(200).json({
+        user: updateduser,
+      });
     })
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "something went wrong"
-    })
-  })
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
 
-exports.verifyCertificate = async(req, res) => {
-  const {details} = req.body
+exports.verifyCertificate = async (req, res) => {
+  const { details } = req.body;
 
-  if((req.user.firstName + " " + req.user.lastName ).toLowerCase() !== details.name.toLowerCase()){
+  if (
+    (req.user.firstName + " " + req.user.lastName).toLowerCase() !==
+    details.name.toLowerCase()
+  ) {
     return res.status(422).json({
-      success: false,
-      message: "Certificate credentials don't match with account details."
-    })
+      message: "Certificate credentials don't match with account details.",
+    });
   }
 
-  User.findOneAndUpdate({_id: req.user._id}, {vaccinationStatus: details.status}, {new: true})
-  .select("-password")
-  .then(updatedUser=>{
-    return res.status(200).json({
-      success: true, 
-      user: updatedUser
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { vaccinationStatus: details.status },
+    { new: true }
+  )
+    .select("-password")
+    .then((updatedUser) => {
+      return res.status(200).json({
+        user: updatedUser,
+      });
     })
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong."
-    })
-  })
-
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong.",
+      });
+    });
+};

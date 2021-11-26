@@ -5,7 +5,6 @@ exports.createCategory = async (req, res) => {
   const { name, group } = req.body;
   if (!name) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -15,14 +14,12 @@ exports.createCategory = async (req, res) => {
     catExists = await Category.findOne({ name });
   } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong.",
     });
   }
 
   if (catExists) {
     return res.status(400).json({
-      success: false,
       message: "Category already exists",
     });
   }
@@ -39,13 +36,11 @@ exports.createCategory = async (req, res) => {
     .save()
     .then((cat) => {
       return res.status(200).json({
-        success: true,
         cat,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "Something went wrong",
       });
     });
@@ -55,13 +50,11 @@ exports.getAllCategories = async (req, res) => {
     .populate("group")
     .then((categories) => {
       res.status(200).json({
-        success: true,
         categories,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -70,7 +63,6 @@ exports.createTopic = async (req, res) => {
   const { name, parentCategory } = req.body;
   if (!name || !parentCategory) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -80,14 +72,12 @@ exports.createTopic = async (req, res) => {
     catExists = await Category.findOne({ name });
   } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong.",
     });
   }
 
   if (catExists) {
     return res.status(400).json({
-      success: false,
       message: "Category already exists",
     });
   }
@@ -103,13 +93,11 @@ exports.createTopic = async (req, res) => {
     .save()
     .then((cat) => {
       return res.status(200).json({
-        success: true,
         cat,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "Something went wrong",
       });
     });
@@ -120,14 +108,11 @@ exports.getAllTopics = async (req, res) => {
     .populate("parentCategory")
     .then((topics) => {
       res.status(200).json({
-        success: true,
         topics,
       });
     })
     .catch((err) => {
-      console.log(err);
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -141,13 +126,11 @@ exports.getCategoriesByGroup = async (req, res) => {
   })
     .then((categories) => {
       return res.status(200).json({
-        success: true,
         categories,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -158,13 +141,11 @@ exports.getTopicsByCategory = async (req, res) => {
   Category.find({ categoryType: "topic", parentCategory: categoryid })
     .then((topics) => {
       return res.status(200).json({
-        success: true,
         topics,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -173,11 +154,10 @@ exports.getTopicsByCategory = async (req, res) => {
 exports.createPost = async (req, res) => {
   const { group, category, topic, title, content } = req.body;
   let createdBy = req.user._id;
-  if(!category || !topic || !title || !content) {
+  if (!category || !topic || !title || !content) {
     return res.status(422).json({
-      success: false,
-      message: "Please fill all the required fields."
-    })
+      message: "Please fill all the required fields.",
+    });
   }
   const post = new Post({
     group,
@@ -193,13 +173,11 @@ exports.createPost = async (req, res) => {
     .save()
     .then((postCreated) => {
       return res.status(200).json({
-        success: true,
         post: postCreated,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -219,13 +197,11 @@ exports.getPostFilter = async (req, res) => {
     .populate("topic")
     .then((posts) => {
       return res.status(200).json({
-        success: true,
         posts,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
@@ -233,33 +209,29 @@ exports.getPostFilter = async (req, res) => {
 
 exports.deleteCategory = async (req, res) => {
   const { id } = req.body;
-  if(!id){
+  if (!id) {
     return res.status(422).json({
-      success: false,
-      message: "Invalid request"
-    })
+      message: "Invalid request",
+    });
   }
   Category.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({
-        success: true,
         data,
       });
     })
     .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
       });
     });
 };
 exports.editCategory = async (req, res) => {
-  const {name, group} = req.body;
-  const id = req.params.id
+  const { name, group } = req.body;
+  const id = req.params.id;
 
   if (!name) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -269,37 +241,38 @@ exports.editCategory = async (req, res) => {
     catExists = await Category.findOne({ name });
   } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong.",
     });
   }
 
   if (catExists && !catExists._id.equals(id)) {
     return res.status(400).json({
-      success: false,
       message: "Category already exists",
     });
   }
 
-  Category.findOneAndUpdate({_id: id}, {$set: {name: name, group: group}}, {new: true}).then(updatedcat=>{
-    return res.status(200).json({
-      success: true,
-      category: updatedcat
+  Category.findOneAndUpdate(
+    { _id: id },
+    { $set: { name: name, group: group } },
+    { new: true }
+  )
+    .then((updatedcat) => {
+      return res.status(200).json({
+        category: updatedcat,
+      });
     })
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "something went wrong"
-    })
-  })
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
 exports.editTopic = async (req, res) => {
-  const {name, parentCategory} = req.body;
-  const id = req.params.id
+  const { name, parentCategory } = req.body;
+  const id = req.params.id;
 
   if (!name || !parentCategory) {
     return res.status(422).json({
-      success: false,
       message: "Please fill all the required fields.",
     });
   }
@@ -309,104 +282,113 @@ exports.editTopic = async (req, res) => {
     catExists = await Category.findOne({ name });
   } catch (err) {
     return res.status(500).json({
-      success: false,
       message: "Something went wrong.",
     });
   }
 
   if (catExists && !catExists._id.equals(id)) {
     return res.status(400).json({
-      success: false,
       message: "Category already exists",
     });
   }
 
-  Category.findOneAndUpdate({_id: id}, {$set: {name: name, parentCategory: parentCategory}}, {new: true}).then(updatedtopic=>{
-    return res.status(200).json({
-      success: true,
-      category: updatedtopic
-    })
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "something went wrong"
-    })
-  })
-}
-exports.likeForumPost = async (req, res) => {
-  const {id} = req.body;
-  if(!id){
-    return res.status(422).json({
-      success: false,
-      message: "Invalid request."
-    })
-  }
-  Post.findOne({_id: id}).then((post) => {
-    if(post.likes.includes(req.user._id)){
-      post.likes.splice(post.likes.indexOf(req.user._id), 1);
-    }else{
-      post.likes.push(req.user._id);
-    }
-    Post.findOneAndUpdate({_id: id}, {$set: {likes: post.likes}}, {new: true}).then((updated)=>{
+  Category.findOneAndUpdate(
+    { _id: id },
+    { $set: { name: name, parentCategory: parentCategory } },
+    { new: true }
+  )
+    .then((updatedtopic) => {
       return res.status(200).json({
-        success: true,
-        post: updated
-      })
-    }).catch((err) =>{
+        category: updatedtopic,
+      });
+    })
+    .catch((err) => {
       return res.status(500).json({
-        success: false,
         message: "something went wrong",
-      })
+      });
+    });
+};
+exports.likeForumPost = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(422).json({
+      message: "Invalid request.",
+    });
+  }
+  Post.findOne({ _id: id })
+    .then((post) => {
+      if (post.likes.includes(req.user._id)) {
+        post.likes.splice(post.likes.indexOf(req.user._id), 1);
+      } else {
+        post.likes.push(req.user._id);
+      }
+      Post.findOneAndUpdate(
+        { _id: id },
+        { $set: { likes: post.likes } },
+        { new: true }
+      )
+        .then((updated) => {
+          return res.status(200).json({
+            post: updated,
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "something went wrong",
+          });
+        });
     })
-    
-  }).catch(err=>{
-    return res.status(500).json({
-      success: false,
-      message: "something went wrong",
-    })
-  })
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
 
-exports.createComment = async(req, res) => {
-    const {id, content} = req.body
-    if(!id || !content) return res.status(422).json({
-      success: false,
+exports.createComment = async (req, res) => {
+  const { id, content } = req.body;
+  if (!id || !content)
+    return res.status(422).json({
       message: "Invalid or incomplete data.",
+    });
+
+  const comment = new Comment({
+    user: req.user._id,
+    content: content,
+    post: id,
+  });
+
+  comment
+    .save()
+    .then((newcomment) => {
+      return res.status(200).json({
+        comment: newcomment,
+      });
     })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
 
-    const comment = new Comment({user: req.user._id, content: content, post: id});
+exports.getCommentsByPost = async (req, res) => {
+  const { postid } = req.params;
 
-    comment
-      .save()
-      .then(newcomment=>{
-        return res.status(200).json({
-          success: true,
-          comment: newcomment
-        })
-      })
-      .catch(err=>{
-        return res.status(500).json({
-          success: false,
-          message: "Something went wrong",
-        })
-      })
-}
-
-exports.getCommentsByPost = async(req, res) => {
-  const {postid} = req.params
-
-  Comment.find({post: postid})
-  .populate({path:'user', select: ["firstName", "lastName", "email", "enrollmentNumber"]})
-  .then(comments=>{
-    return res.status(200).json({
-      sucsess: true,
-      comments
+  Comment.find({ post: postid })
+    .populate({
+      path: "user",
+      select: ["firstName", "lastName", "email", "enrollmentNumber"],
     })
-  }).catch(err=>{
-    console.log(err)
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
+    .then((comments) => {
+      return res.status(200).json({
+        sucsess: true,
+        comments,
+      });
     })
-  })
-}
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};

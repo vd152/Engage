@@ -4,13 +4,16 @@ import { VerifyCertificate } from "../Vaccination/VerifyCertificate";
 import "./index.css";
 import { FaPencilAlt } from "react-icons/fa";
 import Modal from "../Modal";
-import api from '../../apis/api'
-import {currentUser} from '../../redux/actions/UserActions'
+import api from "../../apis/api";
+import { currentUser } from "../../redux/actions/UserActions";
+import Loader from "../Main/Loader";
+import { toast } from 'react-toastify';
 
 class Profile extends React.Component {
   state = {
     disabled: true,
     user: {},
+    loading: false,
   };
   componentDidMount() {
     this.setState({ user: this.props.user });
@@ -21,15 +24,26 @@ class Profile extends React.Component {
     this.setState({ user });
   };
   handleSubmit = () => {
+    this.setState({loading: true})
     const { user } = this.state;
-    let url = '/user/'+ this.state.user._id 
-    api.put(url, {user}).then(res=>{
-      this.props.currentUser(res.data.user?._id)
-    }).catch(err=>{
-      console.log(err)
-    })
-  }
+    let url = "/user/" + this.state.user._id;
+    api
+      .put(url, { user })
+      .then((res) => {
+        this.props.currentUser(res.data.user?._id);
+        toast("Profile edited.")
+        this.setState({loading: false})
+      })
+      .catch((err) => {
+        toast.error(`${err.response?.data?.message }`);
+        this.setState({loading: false})
+      });
+  };
   render() {
+    if (this.state.loading)
+      return (
+        <Loader />
+      );
     return (
       <div
         className={
@@ -47,12 +61,6 @@ class Profile extends React.Component {
         </div>
 
         <div className="row m-0 align-items-center">
-          {/* <div className="col-12">
-            <img
-              src="/assets/images/profile-hover.png"
-              className="profile-img"
-            />
-          </div> */}
           <form className="row m-0 align-items-center">
             <div className="col-md-4 m-1">
               <div className="form-group">
@@ -62,7 +70,7 @@ class Profile extends React.Component {
                   name="firstName"
                   className="form-control"
                   disabled={this.state.disabled}
-                  value={this.state.user?.firstName}
+                  value={this.state.user?.firstName || ""}
                   onChange={(e) => {
                     this.setData(e.target.name, e.target.value);
                   }}
@@ -77,8 +85,10 @@ class Profile extends React.Component {
                   name="lastName"
                   className="form-control"
                   disabled={this.state.disabled}
-                  value={this.state.user?.lastName}
-                  onChange={(e)=>{this.setData(e.target.name,e.target.value)}}
+                  value={this.state.user?.lastName || ""}
+                  onChange={(e) => {
+                    this.setData(e.target.name, e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -90,8 +100,10 @@ class Profile extends React.Component {
                   name="email"
                   className="form-control"
                   disabled={this.state.disabled}
-                  value={this.state.user?.email}
-                  onChange={(e)=>{this.setData(e.target.name,e.target.value)}}
+                  value={this.state.user?.email || ""}
+                  onChange={(e) => {
+                    this.setData(e.target.name, e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -103,8 +115,10 @@ class Profile extends React.Component {
                   name="dob"
                   className="form-control"
                   disabled={this.state.disabled}
-                  value={this.state.user?.dob?.substring(0,10)}
-                  onChange={(e)=>{this.setData(e.target.name,e.target.value)}}
+                  value={this.state.user?.dob?.substring(0, 10) || "01-01-2000"}
+                  onChange={(e) => {
+                    this.setData(e.target.name, e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -116,8 +130,10 @@ class Profile extends React.Component {
                   name="contactNumber"
                   className="form-control"
                   disabled={this.state.disabled}
-                  value={this.state.user?.contactNumber}
-                  onChange={(e)=>{this.setData(e.target.name,e.target.value)}}
+                  value={this.state.user?.contactNumber || ""}
+                  onChange={(e) => {
+                    this.setData(e.target.name, e.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -129,43 +145,44 @@ class Profile extends React.Component {
                   className="form-control"
                   name="enrollmentNumber"
                   disabled={this.state.disabled}
-                  value={this.state.user?.enrollmentNumber}
-                  onChange={(e)=>{this.setData(e.target.name,e.target.value)}}
+                  value={this.state.user?.enrollmentNumber || ""}
+                  onChange={(e) => {
+                    this.setData(e.target.name, e.target.value);
+                  }}
                 />
               </div>
             </div>
           </form>
           <>
-        
-          {!this.props.user?.vaccinationStatus && (
-            <div className="col-md-4 m-3">
-              <div className="form-group">
-                <label className="form-label m-1">Vaccination Status</label>
-                <button
-                  className="btn add-button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#vaccination"
-                >
-                  Vaccination certificate verification
-                </button>
+            {!this.props.user?.vaccinationStatus && (
+              <div className="col-md-4 m-3">
+                <div className="form-group">
+                  <label className="form-label m-1">Vaccination Status</label>
+                  <button
+                    className="btn add-button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#vaccination"
+                  >
+                    Vaccination certificate verification
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-           {!this.state.disabled &&
-          <div className="col-md-4 m-1 px-5 text-end">
-              <div className="form-group text-right">
-                <button
-                  className="btn add-button"
-                  onClick={(e)=>{
-                    e.preventDefault();
-                    this.handleSubmit()
-                  }}
-                >
-                  Edit user
-                </button>
+            )}
+            {!this.state.disabled && (
+              <div className="col-md-4 m-1 px-5 text-end">
+                <div className="form-group text-right">
+                  <button
+                    className="btn add-button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.handleSubmit();
+                    }}
+                  >
+                    Edit user
+                  </button>
+                </div>
               </div>
-            </div>
-  }
+            )}
           </>
         </div>
         <Modal target="vaccination" heading="Verify your certificate">
@@ -180,4 +197,4 @@ const mapStateToProps = (state) => {
     user: state.currentUser.user,
   };
 };
-export default connect(mapStateToProps, {currentUser})(Profile);
+export default connect(mapStateToProps, { currentUser })(Profile);
