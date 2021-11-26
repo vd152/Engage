@@ -1,5 +1,6 @@
 import React from 'react';
 import { Redirect } from 'react-router';
+import { FaTrashAlt } from "react-icons/fa";
 import api from '../../apis/api'
 class GroupTile extends React.Component {
     state={
@@ -7,11 +8,18 @@ class GroupTile extends React.Component {
     }
     leaveGroup = (code) =>{ 
         api.post('/group/leave', {code}).then(res=>{
-            console.log(res);
             window.location.reload();
           }).catch(err=>{
             console.log(err);
           })
+    }
+    deleteGroup = (id) => {
+        api.post('/group/delete', {id, requiredPermission: "Delete Groups"}).then(res=>{
+            window.location.reload();
+
+        }).catch(err=>{
+            console.log(err);
+        })
     }
     render(){
         if(this.state.redirect) return <Redirect to={{
@@ -27,11 +35,15 @@ class GroupTile extends React.Component {
                     <button className="btn btn-primary view-button m-2" onClick={(e)=>{
                         e.preventDefault();
                         this.setState({redirect: true})
-                    }}>View Classes</button>
+                    }}>Schedule</button>
                     <button className="btn btn-primary leave-button m-2" onClick={(e)=>{
                         e.preventDefault();
                         this.leaveGroup(this.props.group.code)
                     }}>Leave</button>
+                    {this.props.user?._id === this.props.group.createdBy?._id &&  <button className="btn btn-primary leave-button m-2" onClick={(e)=>{
+                        e.preventDefault();
+                        this.deleteGroup(this.props.group?._id)
+                    }}><FaTrashAlt/></button>}
                 </div>
             </div>
         )

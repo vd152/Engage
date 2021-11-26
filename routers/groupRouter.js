@@ -7,5 +7,6 @@ router.get('/', passport.authenticate('jwt',{session: false}), controller.getGro
 router.post('/', passport.authenticate('jwt',{session: false}), checkPermission, controller.addGroup);
 router.post('/join', passport.authenticate('jwt',{session: false}), controller.joinGroup);
 router.post('/leave', passport.authenticate('jwt',{session: false}), controller.leaveGroup);
+router.post('/delete', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteGroup);
 
 module.exports = router;

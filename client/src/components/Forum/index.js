@@ -1,6 +1,5 @@
 import React from "react";
 import "./index.css";
-import { FaAngleDown } from "react-icons/fa";
 import PostTile from "./PostTile";
 import Modal from "../Modal";
 import { connect } from "react-redux";
@@ -21,11 +20,11 @@ class Forum extends React.Component {
     allCategories: [],
     allTopics: [],
     posts: [],
-    singlePost : "",
+    singlePost: "",
   };
   componentDidMount() {
     this.getCategories();
-    this.getPost()
+    this.getPost();
   }
   getCategories = () => {
     let url = "/forum/category/" + this.state.selectedGroup;
@@ -50,29 +49,39 @@ class Forum extends React.Component {
       });
   };
   createPost = () => {
-    api.post("/forum/post", {
-      group: this.state.selectedGroup == "" ? null : this.state.selectedGroup,
-      category: this.state.selectedCategory,
-      topic: this.state.selectedTopic,
-      title: this.state.title,
-      content: this.state.content,
-      requiredPermission: "Create Posts"
-    }).then(res => {
-      console.log(res);
-    }).catch(err => {
-      console.log(err);
-    })
+    api
+      .post("/forum/post", {
+        group: this.state.selectedGroup == "" ? null : this.state.selectedGroup,
+        category: this.state.selectedCategory,
+        topic: this.state.selectedTopic,
+        title: this.state.title,
+        content: this.state.content,
+        requiredPermission: "Create Posts",
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   getPost = () => {
-    api.post('forum/post/filter', {group:this.state.filtergroup, category: this.state.filtercategory, topic: this.state.filtertopic}).then(res=>{
-      this.setState({posts: res.data?.posts});
-    }).catch(err=>{
-      console.log(err);
-    })
-  }
+    api
+      .post("forum/post/filter", {
+        group: this.state.filtergroup,
+        category: this.state.filtercategory,
+        topic: this.state.filtertopic,
+      })
+      .then((res) => {
+        this.setState({ posts: res.data?.posts });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   setSingle = (id) => {
-    this.setState({singlePost: id})
-  }
+    this.setState({ singlePost: id });
+  };
   render() {
     return (
       <div
@@ -93,75 +102,49 @@ class Forum extends React.Component {
           </button>
           <div className="d-flex m-0 align-items-center justify-content-end">
             <span className=" filter-text">Filter: </span>
-            <div className="dropdown  filter-button-container">
-              <button
-                className="filter-button dropdown-toggle p-2"
-                type="button"
-                id="dropdownMenuButton2"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Group
-                <FaAngleDown />
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="dropdownMenuButton2"
-              >
-                <li  className="dropdown-item">Select</li>
-                {this.props.user?.groups?.map((group,key)=>{
-                  return <li key={key} className="dropdown-item">{group.name}</li>
-                })}
-              </ul>
-            </div>
-            <div className="dropdown  filter-button-container">
-              <button
-                className="filter-button dropdown-toggle p-2"
-                type="button"
-                id="dropdownMenuButton2"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                
-                Category
-                <FaAngleDown />
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="dropdownMenuButton2"
-              >
-                <li  className="dropdown-item">Select</li>
-                <li>Item</li>
-              </ul>
-            </div>
-            <div className="dropdown filter-button-container">
-              <button
-                className=" filter-button dropdown-toggle p-2"
-                type="button"
-                id="dropdownMenuButton2"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Topic
-                <FaAngleDown />
-              </button>
-              <ul
-                className="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="dropdownMenuButton2"
-              >
-                <li  className="dropdown-item">Select</li>
-                <li>Item</li>
-              </ul>
-            </div>
+            <select
+              className="filter-button"
+              value={this.state.filtergroup}
+              onChange={(e) => {
+                this.setState({ filtergroup: e.target.value }, ()=>{
+                  this.getPost()
+                });
+              }}
+            >
+              <option value="">Group</option>
+              {this.props.user?.groups?.map((group, key) => {
+                return (
+                  <option key={key} value={group._id}>
+                    {group.name}
+                  </option>
+                );
+              })}
+            </select>
+           
+        
           </div>
         </div>
-        {this.state.singlePost == ""? 
-        <div className="row mx-0 mt-3 justify-content-center post-row">
-          {this.state.posts.map((post,key)=>{
-
-          return <PostTile post={post} key={key} refresh={this.getPost} viewPost={this.setSingle}/>
-          })}
-        </div>: <SinglePost back={this.setSingle} post={this.state.singlePost} refresh={this.getPost}/>}
+        {this.state.singlePost == "" ? (
+          <div className="row mx-0 mt-3 justify-content-center post-row">
+            {this.state.posts.length === 0 && <p>No posts found</p>}
+            {this.state.posts.map((post, key) => {
+              return (
+                <PostTile
+                  post={post}
+                  key={key}
+                  refresh={this.getPost}
+                  viewPost={this.setSingle}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <SinglePost
+            back={this.setSingle}
+            post={this.state.singlePost}
+            refresh={this.getPost}
+          />
+        )}
         <Modal target="createpost" heading="Ask a Question/ Discuss">
           <form>
             <div className="form-group">
@@ -212,7 +195,7 @@ class Forum extends React.Component {
                 className="form-control"
                 value={this.state.selectedTopic}
                 onChange={(e) => {
-                  this.setState({ selectedTopic: e.target.value})
+                  this.setState({ selectedTopic: e.target.value });
                 }}
               >
                 <option value="">Please select a topic</option>

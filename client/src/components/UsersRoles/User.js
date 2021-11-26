@@ -9,6 +9,7 @@ import Modal from "../Modal";
 export default class User extends React.Component {
   state = {
     loading: false,
+    
     tableData: {
       columns: [
         {

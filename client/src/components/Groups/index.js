@@ -62,7 +62,7 @@ class Groups extends React.Component {
           </div>
           <div className="m-3 row align-items-center justify-content-center group-row">
             {this.props.user?.groups?.map((group, key)=>{
-              return <GroupTile key={key} group={group}/>
+              return <GroupTile key={key} group={group} user={this.props.user}/>
             })}
           </div>
         </div>

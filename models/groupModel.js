@@ -12,8 +12,8 @@ const groupSchema = new mongoose.Schema(
       unique: true
     },
     displayPicture: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'media'
+        type: String,
+        default: null
     },
     users: [
         {

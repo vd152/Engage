@@ -29,8 +29,8 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     displayPicture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'media'
+      type: String,
+      default: null
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,

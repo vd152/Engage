@@ -136,6 +136,48 @@ exports.deleteUser = async(req, res) => {
     });
 }
 
+exports.editUser = async(req, res) => {
+  const {user} = req.body
+  const id = req.params.id
+  if(!user || !user.email || !user.enrollmentNumber){
+    return res.status(422).json({
+      success: false,
+      message: "Please fill required fields"
+    })
+  }
+  let foundUser;
+  try{
+    foundUser = await User.findOne({_id: id})
+  }catch(err){
+    
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    })
+  }
+  if(!foundUser){
+    return res.status(404).json({
+      success: false,
+      message: "User not found."
+    })
+  }
+
+  let newUser = {foundUser, ...user}
+  User.findOneAndUpdate({_id: id}, {$set: newUser}, {new: true})
+  .select("-password")
+  .then(updateduser=>{
+    return res.status(200).json({
+      success: true,
+      user: updateduser
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "something went wrong"
+    })
+  })
+}
+
 exports.verifyCertificate = async(req, res) => {
   const {details} = req.body
 

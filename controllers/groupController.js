@@ -195,3 +195,40 @@ exports.leaveGroup = async (req, res) => {
         });
   })
 };
+
+exports.deleteGroup = async(req, res) => {
+  const {id} = req.body
+  if(!id){
+    return res.status(404).json({
+      success: false,
+      message: "Please fill required field."
+    })
+  }
+  let foundGroup;
+  try{
+    foundGroup = await Group.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    })
+  }
+  if(!foundGroup){
+    return res.status(404).json({
+      success: false,
+      message: "Group not found"
+    })
+  }
+
+  Group.deleteOne({_id: id}).then(data=>{
+    return res.status(200).json({
+      success: true,
+      data
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    })
+  })
+}

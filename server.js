@@ -51,10 +51,6 @@ app.use('/group', groupRouter);
 app.use('/schedule', scheduleRouter);
 app.use('/forum', forumRouter);
 
-if(process.env.NODE_ENV === 'production'){
-  app.use(express.static('client/build'))
-}
-
 
 app.listen(PORT,()=>{
     console.log(`listening on port ${PORT}`)
