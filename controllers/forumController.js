@@ -253,7 +253,86 @@ exports.deleteCategory = async (req, res) => {
       });
     });
 };
+exports.editCategory = async (req, res) => {
+  const {name, group} = req.body;
+  const id = req.params.id
 
+  if (!name) {
+    return res.status(422).json({
+      success: false,
+      message: "Please fill all the required fields.",
+    });
+  }
+
+  let catExists;
+  try {
+    catExists = await Category.findOne({ name });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong.",
+    });
+  }
+
+  if (catExists && !catExists._id.equals(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Category already exists",
+    });
+  }
+
+  Category.findOneAndUpdate({_id: id}, {$set: {name: name, group: group}}, {new: true}).then(updatedcat=>{
+    return res.status(200).json({
+      success: true,
+      category: updatedcat
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "something went wrong"
+    })
+  })
+}
+exports.editTopic = async (req, res) => {
+  const {name, parentCategory} = req.body;
+  const id = req.params.id
+
+  if (!name || !parentCategory) {
+    return res.status(422).json({
+      success: false,
+      message: "Please fill all the required fields.",
+    });
+  }
+
+  let catExists;
+  try {
+    catExists = await Category.findOne({ name });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong.",
+    });
+  }
+
+  if (catExists && !catExists._id.equals(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Category already exists",
+    });
+  }
+
+  Category.findOneAndUpdate({_id: id}, {$set: {name: name, parentCategory: parentCategory}}, {new: true}).then(updatedtopic=>{
+    return res.status(200).json({
+      success: true,
+      category: updatedtopic
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "something went wrong"
+    })
+  })
+}
 exports.likeForumPost = async (req, res) => {
   const {id} = req.body;
   if(!id){

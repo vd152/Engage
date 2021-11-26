@@ -5,8 +5,12 @@ const checkPermission = require('../utils/checkPermission')
 
 router.get('/category', passport.authenticate('jwt',{session: false}), controller.getAllCategories)
 router.post('/category', passport.authenticate('jwt',{session: false}), checkPermission, controller.createCategory)
+router.put('/category/:id', passport.authenticate('jwt',{session: false}), checkPermission, controller.editCategory)
+
 router.get('/topic', passport.authenticate('jwt',{session: false}), controller.getAllTopics)
 router.post('/topic', passport.authenticate('jwt',{session: false}), checkPermission, controller.createTopic)
+router.put('/topic/:id', passport.authenticate('jwt',{session: false}), checkPermission, controller.editTopic)
+
 
 router.get('/category/:groupid', passport.authenticate('jwt',{session: false}), controller.getCategoriesByGroup)
 router.get('/topic/:categoryid', passport.authenticate('jwt',{session: false}), controller.getTopicsByCategory)

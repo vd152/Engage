@@ -12,6 +12,8 @@ import {connect } from "react-redux"
   state = {
     loading1: false,
     loading2: false,
+    edit: false, 
+    editid: "",
     tableDataCat: {
       columns: [
         {
@@ -41,10 +43,13 @@ import {connect } from "react-redux"
           cell: (row) => (
             <button
               className=" row-btn"
-              //   onClick={(e) => {
-              //     e.preventDefault();
-              //     this.handleEdit(row);
-              //   }}
+              onClick={(e) => {
+                e.preventDefault();
+                this.setState({group: row.groupid, catName: row.name,editid: row._id, edit: true}, ()=>{
+                  document.querySelector("#editcat").click()
+                })
+                
+              }}
             >
               <FaEdit />
             </button>
@@ -97,10 +102,13 @@ import {connect } from "react-redux"
             cell: (row) => (
               <button
                 className=" row-btn"
-                //   onClick={(e) => {
-                //     e.preventDefault();
-                //     this.handleEdit(row);
-                //   }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({selectedCategory: row.catid, topicName: row.name,editid: row._id, edit: true}, ()=>{
+                    document.querySelector("#edittopic").click()
+                  })
+                  
+                }}
               >
                 <FaEdit />
               </button>
@@ -143,6 +151,7 @@ import {connect } from "react-redux"
               id: i,
               name: val.name,
               group: val.group?.name?val.group?.name:"General",
+              groupid: val.group?._id,
               _id: val._id,
               type: val.categoryType,
               created: format(val.createdAt),
@@ -168,6 +177,7 @@ import {connect } from "react-redux"
               id: i,
               name: val.name,
               category: val.parentCategory?.name,
+              catid: val.parentCategory?._id,
               _id: val._id,
               created: format(val.createdAt),
             };
@@ -211,6 +221,22 @@ import {connect } from "react-redux"
     })
 
   }
+  editCategory = () => {
+    let url = '/forum/category/'+this.state.editid
+    api.put(url, {name: this.state.catName, group: this.state.group, requiredPermission: "Edit Categories"}).then(res=>{
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+  editTopic = () =>{
+    let url = '/forum/topic/'+this.state.editid
+    api.put(url, {name: this.state.topicName, parentCategory: this.state.selectedCategory, requiredPermission: "Edit Topics"}).then(res=>{
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
   render() {
     return (
       <div>
@@ -218,8 +244,20 @@ import {connect } from "react-redux"
           className="btn add-button"
           data-bs-toggle="modal"
           data-bs-target="#addcat"
+          onClick={(e) => {
+            this.setState({group: "", catName: "", edit: false})
+          }}
         >
           Add a category
+        </button>
+        <button
+          className="btn add-button"
+          data-bs-toggle="modal"
+          id="editcat"
+          data-bs-target="#addcat"
+          style={{visibility: "hidden"}}
+        >
+          
         </button>
         <DataTableExtensions {...this.state.tableDataCat}>
           <DataTable
@@ -237,8 +275,20 @@ import {connect } from "react-redux"
           className="btn add-button"
           data-bs-toggle="modal"
           data-bs-target="#addtopic"
+          onClick={(e) => {
+            this.setState({topicName: "", selectedCategory: "", edit: false})
+          }}
         >
           Add a topic
+        </button>
+        <button
+          className="btn add-button"
+          data-bs-toggle="modal"
+          id="edittopic"
+          data-bs-target="#addtopic"
+          style={{visibility: "hidden"}}
+        >
+          
         </button>
         <DataTableExtensions {...this.state.tableDataTopic}>
           <DataTable
@@ -252,7 +302,7 @@ import {connect } from "react-redux"
             progressPending={this.state.loading2}
           />
         </DataTableExtensions>
-        <Modal target="addcat" heading="Add a Forum Category">
+        <Modal target="addcat" heading={this.state.edit?"Edit Category":"Add a Forum Category"}>
         <form>
           <div className="form-group">
             <label className="form-label">Group: </label>
@@ -274,7 +324,16 @@ import {connect } from "react-redux"
               />
             </div>
 
-            
+            {this.state.edit?<button
+              className="btn btn-primary add-button mt-2"
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault()
+                this.editCategory()
+              }}
+            >
+              Edit
+            </button> :
             <button
               className="btn btn-primary add-button mt-2"
               type="submit"
@@ -285,9 +344,10 @@ import {connect } from "react-redux"
             >
               Create
             </button>
+  }
           </form>
         </Modal>
-        <Modal target="addtopic" heading="Add a Forum Topic">
+        <Modal target="addtopic" heading={this.state.edit?"Edit Topic":"Add a Forum Topic"}>
         <form>
             <div className="form-group">
             <label className="form-label">Parent Category: </label>
@@ -311,6 +371,16 @@ import {connect } from "react-redux"
                 onChange={(e)=>{this.setState({topicName: e.target.value})}}
               />
             </div>
+            {this.state.edit? <button
+              className="btn btn-primary add-button mt-2"
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault()
+                this.editTopic()
+              }}
+            >
+              Edit
+            </button>:
             <button
               className="btn btn-primary add-button mt-2"
               type="submit"
@@ -321,6 +391,7 @@ import {connect } from "react-redux"
             >
               Create
             </button>
+  }
           </form>
         </Modal>
       </div>

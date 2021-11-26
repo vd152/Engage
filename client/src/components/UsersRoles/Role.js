@@ -10,6 +10,8 @@ import Permission from "./Permissions";
 export default class Role extends React.Component {
   state = {
     loading: false,
+    edit: false,
+    editid: "",
     tableData: {
       columns: [
         {
@@ -36,7 +38,13 @@ export default class Role extends React.Component {
               className=" row-btn"
               onClick={(e) => {
                 e.preventDefault();
-                this.handleEdit(row);
+                const {role} = this.state
+                role.name = row.role
+                role.permissions = role.permissions
+                this.setState({role,editid: row._id, edit: true}, ()=>{
+                  document.querySelector("#editrolebtn").click()
+                })
+                
               }}
             >
               <FaEdit />
@@ -66,9 +74,6 @@ export default class Role extends React.Component {
       permissions: [],
     },
   };
-  handleEdit = (row) => {
-    console.log(row);
-  };
 
   setVal = (val, permName) => {
     const { role } = this.state;
@@ -85,7 +90,6 @@ export default class Role extends React.Component {
       permissions.push({ name: permName, value: JSON.parse(val) });
     }
 
-    console.log(role);
     this.setState({ role });
   };
   componentDidMount() {
@@ -129,48 +133,18 @@ export default class Role extends React.Component {
       console.log(err);
     })
   }
-  render() {
+  editRole = () => {
+    let url = '/role/'+this.state.editid
+    api.put(url, {role: this.state.role, requiredPermission: "Edit Roles"}).then(res=>{
+      console.log(res);
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+  getPermission = () => {
     return (
-      <div>
-        <button
-          className="btn add-button"
-          data-bs-toggle="modal"
-          data-bs-target="#addrole"
-        >
-          Add a role
-        </button>
-        <DataTableExtensions {...this.state.tableData}>
-          <DataTable
-            noHeader
-            defaultSortField="id"
-            defaultSortAsc={true}
-            filterPlaceholder="Search"
-            responsive
-            pagination
-            highlightOnHover
-            progressPending={this.state.loading}
-          />
-        </DataTableExtensions>
-        <Modal target="addrole" heading="Add Role">
-          <form>
-            <div className="form-group">
-              <label className="form-label">Name: </label>
-              <input
-                className="form-control"
-                placeholder="Eg. admin"
-                type="text"
-                value={this.state.role.name}
-                onChange={(e) => {
-                  const { role } = this.state;
-                  role.name = e.target.value;
-                  this.setState({ role });
-                }}
-              />
-            </div>
-
-            <div className="form-group py-2">
-              <label className="form-label">Permissions: </label>
-              <Permission
+      <React.Fragment>
+        <Permission
                 heading="Users"
                 attributes={["Create", "Edit", "Delete"]}
                 suffix="Users"
@@ -188,6 +162,13 @@ export default class Role extends React.Component {
                 heading="Groups"
                 attributes={["Create", "Edit", "Delete"]}
                 suffix="Groups"
+                setVal={this.setVal}
+                editPermissions={this.state.role.permissions}
+              />
+              <Permission
+                heading="Schedule"
+                attributes={["Create", "Edit", "Delete"]}
+                suffix="Schedule"
                 setVal={this.setVal}
                 editPermissions={this.state.role.permissions}
               />
@@ -219,7 +200,81 @@ export default class Role extends React.Component {
                 setVal={this.setVal}
                 editPermissions={this.state.role.permissions}
               />
+      </React.Fragment>
+    )
+  }
+  render() {
+    return (
+      <div>
+        <button
+          className="btn add-button"
+          id="addrolebtn"
+          data-bs-toggle="modal"
+          data-bs-target="#addrole"
+          onClick={(e)=>{
+            const {role} = this.state
+            role.name=""
+            role.permissions = []
+            this.setState({edit: false, role})
+          }}
+        >
+          Add a role
+        </button>
+        <button
+          className="btn add-button"
+          id="editrolebtn"
+          style={{visibility: "hidden"}}
+          data-bs-toggle="modal"
+          data-bs-target="#addrole"
+         
+        >
+          
+        </button>
+       
+        <DataTableExtensions {...this.state.tableData}>
+          <DataTable
+            noHeader
+            defaultSortField="id"
+            defaultSortAsc={true}
+            filterPlaceholder="Search"
+            responsive
+            pagination
+            highlightOnHover
+            progressPending={this.state.loading}
+          />
+        </DataTableExtensions>
+        <Modal target="addrole" heading={this.state.edit ?"Edit Role": "Add Role"}>
+          <form>
+            <div className="form-group">
+              <label className="form-label">Name: </label>
+              <input
+                className="form-control"
+                placeholder="Eg. admin"
+                type="text"
+                value={this.state.role.name}
+                onChange={(e) => {
+                  const { role } = this.state;
+                  role.name = e.target.value;
+                  this.setState({ role });
+                }}
+              />
             </div>
+                {this.state.edit && <p className="mb-0 mt-2 mx-0">Permissions will be overwritten</p>}
+            <div className="form-group py-2">
+              <label className="form-label">Permissions: </label>
+              {this.getPermission()}
+              
+            </div>
+            {this.state.edit?  <button
+              className="btn btn-primary add-button mt-2"
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault()
+                this.editRole();
+              }}
+            >
+              Edit
+            </button>:
             <button
               className="btn btn-primary add-button mt-2"
               type="submit"
@@ -230,8 +285,10 @@ export default class Role extends React.Component {
             >
               Add
             </button>
+  }
           </form>
         </Modal>
+  
       </div>
     );
   }

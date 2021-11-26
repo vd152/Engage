@@ -178,6 +178,42 @@ exports.editUser = async(req, res) => {
   })
 }
 
+exports.editUserAdmin = async (req, res) => {
+  const {role} = req.body
+  const id = req.params.id
+  
+  let foundUser;
+  try{
+    foundUser = await User.findOne({_id: id})
+  }catch(err){
+    
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    })
+  }
+  if(!foundUser){
+    return res.status(404).json({
+      success: false,
+      message: "User not found."
+    })
+  }
+  foundUser.role = role
+  User.findOneAndUpdate({_id: id}, {$set: foundUser}, {new: true})
+  .select("-password")
+  .then(updateduser=>{
+    return res.status(200).json({
+      success: true,
+      user: updateduser
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "something went wrong"
+    })
+  })
+}
+
 exports.verifyCertificate = async(req, res) => {
   const {details} = req.body
 

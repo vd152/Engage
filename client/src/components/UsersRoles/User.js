@@ -9,7 +9,8 @@ import Modal from "../Modal";
 export default class User extends React.Component {
   state = {
     loading: false,
-    
+    editid: "",
+    edit: false,
     tableData: {
       columns: [
         {
@@ -46,7 +47,12 @@ export default class User extends React.Component {
               className=" row-btn"
               onClick={(e) => {
                 e.preventDefault();
-                this.handleEdit(row);
+                const {user} = this.state
+                user.role = row.roleid
+                this.setState({user,editid: row._id, edit: true}, ()=>{
+                  document.querySelector("#edituserbtn").click()
+                })
+                
               }}
             >
               <FaEdit />
@@ -85,9 +91,7 @@ export default class User extends React.Component {
       groups: [],
     },
   };
-  handleEdit = (row) => {
-    console.log(row);
-  };
+
   handleDelete = (row) => {
     api.post('/user/delete', {id: row._id, requiredPermission: "Delete Users" }).then((res) => {
       this.componentDidMount()
@@ -110,6 +114,7 @@ export default class User extends React.Component {
             name: val.firstName + " " + val.lastName,
             email: val.email,
             role: val.role?.name,
+            roleid: val.role?._id,
             _id: val._id
           };
           datalist.push(temp);
@@ -119,7 +124,6 @@ export default class User extends React.Component {
         this.setState({ tableData, loading: false });
       })
       .catch((err) => {
-        console.log(err);
         this.setState({ loading: false });
       });
       api
@@ -139,6 +143,14 @@ export default class User extends React.Component {
       console.log(err);
     })
   }
+  editUser = () => {
+    let url = '/user/admin/'+this.state.editid
+    api.put(url, {role: this.state.user.role, requiredPermission: "Edit Users"}).then((res) => {
+      console.log(res)
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
   render() {
     return (
       <div>
@@ -146,8 +158,21 @@ export default class User extends React.Component {
           className="btn add-button"
           data-bs-toggle="modal"
           data-bs-target="#adduser"
+          onClick={(e)=>{
+            const {user} = this.state
+            user.role=""
+            this.setState({edit: false, user})
+          }}
         >
           Add a user
+        </button>
+        <button
+          className="btn add-button"
+          data-bs-toggle="modal"
+          id="edituserbtn"
+          data-bs-target="#adduser"
+          style={{visibility: "hidden"}}
+        >
         </button>
         <DataTableExtensions {...this.state.tableData}>
           <DataTable
@@ -161,8 +186,9 @@ export default class User extends React.Component {
             progressPending={this.state.loading}
           />
         </DataTableExtensions>
-        <Modal target="adduser" heading="Add a user">
+        <Modal target="adduser" heading={this.state.edit?"Edit User":"Add a user"}>
           <form>
+            {!this.state.edit &&
             <div className="form-group ">
               <label className="form-label">Email: </label>
               <input
@@ -176,7 +202,7 @@ export default class User extends React.Component {
                   this.setState({ user });
                 }}
               />
-            </div>
+            </div>}
 
             <div className="form-group ">
               <label className="form-label">Role: </label>
@@ -196,6 +222,7 @@ export default class User extends React.Component {
                 })}
               </select>
             </div>
+            {!this.state.edit && 
             <div className="form-group">
               <label className="form-label">Enrollment no.: </label>
               <input
@@ -209,7 +236,8 @@ export default class User extends React.Component {
                   this.setState({ user });
                 }}
               />
-            </div>
+            </div>}
+            {!this.state.edit && 
             <div className="form-group">
               <label className="form-label">Password: </label>
               <input
@@ -223,7 +251,17 @@ export default class User extends React.Component {
                   this.setState({ user });
                 }}
               />
-            </div>
+            </div>}
+            {this.state.edit?<button
+              className="btn btn-primary add-button mt-2"
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                this.editUser()
+              }}
+            >
+              Edit
+            </button> :
             <button
               className="btn btn-primary add-button mt-2"
               type="submit"
@@ -233,7 +271,7 @@ export default class User extends React.Component {
               }}
             >
               Add
-            </button>
+            </button>}
           </form>
         </Modal>
       </div>

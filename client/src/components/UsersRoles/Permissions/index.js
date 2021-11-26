@@ -2,35 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import './index.css'
 
-{/* <PermissionGroup
-heading="admin.sliders"
-attributes={["Index", "Create", "Edit", "Delete"]}
-suffix="Slider"
-setVal = {this.setVal}
-editPermissions = {this.state.data.Permissions}
-
-/> 
-
-  setVal =(key, val, permName) => {
-    const {data} = this.state
-    if(key == "Permissions"){
-      var flag = true;
-      const {Permissions} = this.state.data
-      Permissions.map((perm, index)=>{
-        if(perm['name'] == permName){
-          // Permissions.splice(perm, index)
-          perm['value'] = val
-          flag = false;
-        }
-      })
-      if(flag){
-        Permissions.push({name: permName, value: val})
-      }
-    }else{
-      data[key] = val
-    }
-    this.setState({data})
-  }*/}
 class Permission extends React.Component{
 
   setDefault = (perm, value) =>{

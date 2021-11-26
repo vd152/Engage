@@ -45,3 +45,6 @@ input:focus, input:active, select:focus, select:active, textarea:focus, textarea
     box-shadow:none !important;
     
 }
+.data-table-extensions-action{
+    display: none;
+}

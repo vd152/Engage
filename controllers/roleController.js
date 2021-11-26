@@ -73,3 +73,38 @@ exports.deleteRole = async(req, res) => {
       });
 
 }
+
+exports.editRole = async(req, res) => {
+    const {role} = req.body
+    const id = req.params.id
+
+    let foundRole;
+    try{
+        foundRole = await Role.findOne({_id: id})
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "something went wrong",
+        })
+    }
+    if(!foundRole){
+        return res.status(404).json({
+            success: false,
+            message: "Role not found."
+          })
+    }
+
+    let newRole = {foundRole, ...role};
+
+    Role.findOneAndUpdate({_id: id}, {$set: newRole}, {new: true}).then(updatedrole=>{
+        return res.status(200).json({
+          success: true,
+          role: updatedrole
+        })
+      }).catch(err=>{
+        return res.status(500).json({
+          success: false,
+          message: "something went wrong"
+        })
+      })
+}
