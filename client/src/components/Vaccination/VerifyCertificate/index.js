@@ -30,26 +30,24 @@ export const VerifyCertificate = () => {
     };
    
     return (
-        <div className="container-fluid">
+        <div className="container">
             {
                 !result &&
                 <>
                     {!showScanner &&
                     <>
-                    <input type="file" onChange={(e)=>{setImg(e.target.files[0])}}/>
-                        <button className="custom-button green-btn" onClick={() => setShowScanner(true)}>
-                            <span>Scan QR code</span>
+                    <input type="file" onChange={(e)=>{setImg(e.target.files[0])}} />
+                        <button className="btn add-button m-1" onClick={() => setShowScanner(true)}>
+                            <span>Verify</span>
                         </button>
-                        <Container className="mt-5 p-4 mb-5">
-                          
-                          
-                        </Container>
+                        
                     </>}
                     {showScanner &&
                     <>
                         <QRScanner onError={handleError}
                                    onScan={handleScan} img={img}/>
-                        <button className="custom-button green-btn" onClick={() => setShowScanner(false)}>BACK</button>
+                        <button className="btn add-button" onClick={() => setShowScanner(false)}>BACK</button>
+                        <p className="text-muted">Please add a clear image of the vaccination certificate if it's taking too long.</p>
                     </>
                     }
                 </>

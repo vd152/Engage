@@ -135,3 +135,29 @@ exports.deleteUser = async(req, res) => {
       });
     });
 }
+
+exports.verifyCertificate = async(req, res) => {
+  const {details} = req.body
+
+  if((req.user.firstName + " " + req.user.lastName ).toLowerCase() !== details.name.toLowerCase()){
+    return res.status(422).json({
+      success: false,
+      message: "Certificate credentials don't match with account details."
+    })
+  }
+
+  User.findOneAndUpdate({_id: req.user._id}, {vaccinationStatus: details.status}, {new: true})
+  .select("-password")
+  .then(updatedUser=>{
+    return res.status(200).json({
+      success: true, 
+      user: updatedUser
+    })
+  }).catch(err=>{
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong."
+    })
+  })
+
+}

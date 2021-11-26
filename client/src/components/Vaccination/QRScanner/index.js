@@ -2,16 +2,16 @@ import React, {Component} from 'react';
 import './index.css';
 import {scanImageData} from "zbar.wasm";
 
-const SCAN_PERIOD_MS = 100;
+const SCAN_PERIOD_MS = 1000;
 
-function hasGetUserMedia() {
-    return !!(
-        (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia
-    );
-}
+// function hasGetUserMedia() {
+//     return !!(
+//         (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
+//         navigator.webkitGetUserMedia ||
+//         navigator.mozGetUserMedia ||
+//         navigator.msGetUserMedia
+//     );
+// }
 
 export default class QRScanner extends Component {
     static defaultProps = {
@@ -45,7 +45,14 @@ export default class QRScanner extends Component {
         // if (!this.state.hasUserMedia && !QRScanner.userMediaRequested) {
         //     this.requestUserMedia();
         // }
+        let count = 0;
         QRScanner.scanTimer = setInterval(() => {
+            count++;
+            if(count > 20) {
+                
+                clearInterval(QRScanner.scanTimer)
+                window.location.reload()
+            };
             this.scanBarcode();
         }, SCAN_PERIOD_MS);
 
@@ -66,15 +73,15 @@ export default class QRScanner extends Component {
         const index = QRScanner.mountedInstances.indexOf(this);
         QRScanner.mountedInstances.splice(index, 1);
 
-        QRScanner.userMediaRequested = false;
-        if (QRScanner.mountedInstances.length === 0 && this.state.hasUserMedia) {
-            if (this.stream.getVideoTracks && this.stream.getAudioTracks) {
-                this.stream.getVideoTracks().map(track => track.stop());
-            } else {
-                this.stream.stop();
-            }
-            window.URL.revokeObjectURL(this.state.src);
-        }
+        // QRScanner.userMediaRequested = false;
+        // if (QRScanner.mountedInstances.length === 0 && this.state.hasUserMedia) {
+        //     if (this.stream.getVideoTracks && this.stream.getAudioTracks) {
+        //         this.stream.getVideoTracks().map(track => track.stop());
+        //     } else {
+        //         this.stream.stop();
+        //     }
+        //     window.URL.revokeObjectURL(this.state.src);
+        // }
     }
 
     scanBarcode = async () => {
@@ -95,7 +102,7 @@ export default class QRScanner extends Component {
         };
       
         reader.readAsDataURL(selectedFile);
-        // img.src = "/cert.JPG"
+
         ctx.drawImage(imgtag, 0, 0, this.props.width, this.props.height);
         let data = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const symbols = await scanImageData(data);

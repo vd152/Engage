@@ -15,9 +15,10 @@ import Profile from "../components/Profile";
 import Manage from "../components/UsersRoles";
 class router extends React.Component {
   componentDidMount() {
-    if(getUser())
+    if(getUser()){
       this.props.currentUser(getUser())
-    this.props.getForumCategories()
+      this.props.getForumCategories()
+    }
   }
   render(){
     return (

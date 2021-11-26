@@ -15,6 +15,7 @@ import {addEventAction, EVENT_TYPES} from "../../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {ordinal_suffix_of} from "../../../utils/utils";
+import api from '../../../apis/api'
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -68,7 +69,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         } catch (e) {
             console.log(e);
         }
-    }, 100)
+    }, 1000)
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -126,7 +127,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         }
         setTimeout(() => {
             verifyData()
-        }, 500)
+        }, 1000)
 
     }, []);
 
@@ -146,11 +147,22 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         if (!data || !data["evidence"]) {
             return ""
         }
-
         const dose = data["evidence"][0]["dose"]
         const totalDoses = data["evidence"][0]["totalDoses"] || 2
 
         if (dose === totalDoses) {
+            let details = {
+                name: data.credentialSubject.name, 
+                age: data.credentialSubject.age,
+                status: true
+            }
+            console.log(details)
+            api.post('/user/verify/vaccination', {details}).then(res=>{
+                console.log(res)
+                window.location.reload()
+            }).catch(err=>{
+                console.log(err)
+            })
             return "Final Certificate for COVID-19 Vaccination"
         } else {
             return `Provisional Certificate for COVID-19 Vaccination (${getDose(data)} Dose)`
@@ -203,7 +215,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 </table>
             }
             <br/>
-            <button className="custom-button blue-btn m-3" onClick={goBack}>Verify Another Certificate</button>
+            {!isValid &&
+            <button className="btn add-button m-3" onClick={goBack}>Verify Another Certificate</button>}
             {/*<SmallInfoCards text={"Provide Feedback"}*/}
             {/*                onClick={() => {*/}
             {/*                    history.push("/side-effects")*/}

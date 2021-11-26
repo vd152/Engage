@@ -26,6 +26,7 @@
   z-index: 10;
   background: rgb(222 226 230 / 60%);
 }
+
 @media (min-width:961px) {
   .verify-certificate-wrapper .qr-camera {
     width: 25%;
