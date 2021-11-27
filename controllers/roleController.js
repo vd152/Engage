@@ -53,6 +53,24 @@ exports.addRole = async (req, res) => {
 
 exports.deleteRole = async (req, res) => {
   const id = req.body.id;
+  let foundRole;
+  try{
+    foundRole = await Role.findOne({_id: id})
+  }catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  }
+  if(!foundRole){
+    return res.status(404).json({
+      message: "Role not found"
+    })
+  }
+  if(foundRole.name === "admin"){
+    return res.status(401).json({
+      message: "You cannot delete the admin role"
+    })
+  }
   Role.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({
