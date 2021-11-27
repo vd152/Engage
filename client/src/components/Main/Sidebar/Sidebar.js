@@ -15,30 +15,7 @@ class Sidebar extends React.Component {
         }
       >
         <div className="sideNavItems">
-          <div             className="sideNavlink"
-            onClick={(e) => {
-              this.props.setActive("Home");
-              this.setState({ url: "/" });
-            }}>
-            <div className={this.props.active === "Home" ? "activeLink" : ""}>
-              <img
-              className="currentSideBarIcon"
-                src={
-                  this.props.active === "Home"
-                    ? "/assets/images/home-hover.png"
-                    : "/assets/images/home.png"
-                }
-                alt="Home"
-              />
-            </div>
-            <div
-              className={
-                this.props.active === "Home" ? "activeSideNavLink" : ""
-              }
-            >
-              Home
-            </div>
-          </div>
+          
           <div
             className="sideNavlink"
             onClick={(e) => {

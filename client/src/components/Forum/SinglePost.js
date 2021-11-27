@@ -1,39 +1,63 @@
 import React from "react";
-import { FaComment, FaThumbsUp } from "react-icons/fa";
+import {FaTrashAlt, FaThumbsUp } from "react-icons/fa";
 import { format } from "timeago.js";
 import { connect } from "react-redux";
-import api from '../../apis/api'
+import api from "../../apis/api";
+import Loader from "../Main/Loader";
 class SinglePost extends React.Component {
-    state={
-        content: "", 
-        comments: []
-    }
-    componentDidMount(){
-        this.getComments()
-    }
-    likeTogglePost = () => {
-        api.post('/forum/post/like', {id: this.props.post?._id}).then(res=>{
-          this.props.refresh()
-        }).catch(err => {
-          console.log(err)
-        })
-      };
-    getComments = () => {
-        let url = '/forum/post/comment/'+this.props.post?._id
-        api.post(url).then(res=>{
-            this.setState({comments: res.data?.comments})
-        }).catch(err => {
-            console.log(err)
-        })
-    }
-postComment = () => {
-    api.post('/forum/post/comment', {id: this.props.post?._id, content: this.state.content, requiredPermission: "Create Comments"}).then(res=>{
-        this.getComments()
-        this.setState({content: ""})
-    }).catch(err => {
-        console.log(err)
-    })
-}
+  state = {
+    content: "",
+    comments: [],
+    liked: false,
+    loadingLike: false,
+    loadingComments: false,
+  };
+  componentDidMount() {
+    this.getComments();
+    this.setState({
+      liked: this.props.post?.likes?.includes(this.props.user._id),
+    });
+  }
+  likeTogglePost = () => {
+    this.setState({ loadingLike: true });
+    api
+      .post("/forum/post/like", { id: this.props.post?._id })
+      .then((res) => {
+        this.setState({ liked: !this.state.liked, loadingLike: false });
+      })
+      .catch((err) => {
+        console.log(err);
+        this.setState({ loadingLike: false });
+      });
+  };
+  getComments = () => {
+    this.setState({ loadingComments: true });
+    let url = "/forum/post/comment/" + this.props.post?._id;
+    api
+      .post(url)
+      .then((res) => {
+        this.setState({ comments: res.data?.comments, loadingComments: false });
+      })
+      .catch((err) => {
+        console.log(err);
+        this.setState({ loadingComments: false });
+      });
+  };
+  postComment = () => {
+    api
+      .post("/forum/post/comment", {
+        id: this.props.post?._id,
+        content: this.state.content,
+        requiredPermission: "Create Comments",
+      })
+      .then((res) => {
+        this.getComments();
+        this.setState({ content: "" });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   render() {
     return (
       <>
@@ -43,6 +67,7 @@ postComment = () => {
               className="btn btn-dark"
               onClick={(e) => {
                 e.preventDefault();
+                this.props.refresh();
                 this.props.back("");
               }}
             >
@@ -70,22 +95,26 @@ postComment = () => {
                 Posted by:{" "}
                 {this.props.post.createdBy?.firstName +
                   " " +
-                  this.props.post.createdBy?.lastName + " - " + this.props.post.createdBy?.email} 
+                  this.props.post.createdBy?.lastName +
+                  " - " +
+                  this.props.post.createdBy?.email}
               </div>
             </div>
             <div className="col-auto d-flex flex-column align-items-center justify-content-center">
-              <FaThumbsUp
-                className="post-icon"
-                style={{
-                  color: this.props.post?.likes?.includes(this.props.user._id)
-                    ? "red"
-                    : "black",
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.likeTogglePost();
-                }}
-              />
+              {this.state.loadingLike ? (
+                <Loader height="50" width="50" />
+              ) : (
+                <FaThumbsUp
+                  className="post-icon"
+                  style={{
+                    color: this.state.liked ? "red" : "black",
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.likeTogglePost();
+                  }}
+                />
+              )}
             </div>
             <hr />
             <div className="comment-section my-2">
@@ -97,7 +126,9 @@ postComment = () => {
                     className="form-control"
                     placeholder="Start typing..."
                     value={this.state.content}
-                    onChange={(e) => {this.setState({content: e.target.value})}}
+                    onChange={(e) => {
+                      this.setState({ content: e.target.value });
+                    }}
                   />
                 </div>
                 <div className="row m-0 justify-content-end">
@@ -105,7 +136,7 @@ postComment = () => {
                     className="btn btn-primary add-button mt-2 "
                     onClick={(e) => {
                       e.preventDefault();
-                      this.postComment()
+                      this.postComment();
                     }}
                   >
                     Post Comment
@@ -113,16 +144,35 @@ postComment = () => {
                 </div>
               </form>
               <hr />
-              <div className="row ">
-                  {this.state.comments.map((comment, key) =>{
-                      return  <div className="col-12 comment-bg" key={key}>
-                      <p className=" m-0">{comment.user?.firstName + " " + comment.user?.lastName + " " + comment.user?.email} - <span className="text-muted">{format(comment.createdAt)}</span></p>
-                      <p className="m-0">{comment.content}</p>
-                  </div>
+              {this.state.loadingComments ? (
+                "Loading.."
+              ) : (
+                <div className="row ">
+                  {this.state.comments.map((comment, key) => {
+                    return (
+                      <div className="row comment-bg justify-content-between">
+                      <div className="col-9 " key={key}>
+                        <p className=" m-0">
+                          {comment.user?.firstName +
+                            " " +
+                            comment.user?.lastName +
+                            " " +
+                            comment.user?.email}{" "}
+                          -{" "}
+                          <span className="text-muted">
+                            {format(comment.createdAt)}
+                          </span>
+                        </p>
+                        <p className="m-0">{comment.content}</p>
+                      </div>
+                      <div className="col-2">
+                        <button className="btn"><FaTrashAlt/></button>
+                      </div>
+                      </div>
+                    );
                   })}
-                 
-                  
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -3,13 +3,25 @@ import { FaComment, FaThumbsUp } from "react-icons/fa";
 import { format } from "timeago.js";
 import api from "../../apis/api";
 import { connect} from 'react-redux'
+import Loader from "../Main/Loader";
 
 class PostTile extends React.Component {
+  state={
+    loading: false,
+  }
+  componentWillUnmount() {
+    // fix Warning: Can't perform a React state update on an unmounted component
+    this.setState = (state,callback)=>{
+        return;
+    };
+}
   likeTogglePost = () => {
+  this.setState({loading: true});
     api.post('/forum/post/like', {id: this.props.post?._id}).then(res=>{
       this.props.refresh()
+      this.setState({loading: false});
     }).catch(err => {
-      console.log(err)
+     this.setState({loading: false});
     })
   };
 
@@ -31,6 +43,7 @@ class PostTile extends React.Component {
           <p className="mb-auto">{this.props.post?.content}</p>
         </div>
         <div className="col-auto d-flex flex-column align-items-center justify-content-center">
+          {this.state.loading?  <Loader  height="50" width="50"/>: <React.Fragment>
           <FaThumbsUp
             className="post-icon"
             style={{color: this.props.post?.likes?.includes(this.props.user._id)?'red':"black"}}
@@ -43,6 +56,8 @@ class PostTile extends React.Component {
               e.preventDefault();
               this.props.viewPost(this.props.post);
             }}/>
+            </React.Fragment>}
+          
         </div>
       </div>
     );

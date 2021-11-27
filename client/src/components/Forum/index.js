@@ -5,6 +5,7 @@ import Modal from "../Modal";
 import { connect } from "react-redux";
 import api from "../../apis/api";
 import SinglePost from "./SinglePost";
+import Loader from "../Main/Loader";
 class Forum extends React.Component {
   state = {
     selectedGroup: "none",
@@ -21,19 +22,28 @@ class Forum extends React.Component {
     allTopics: [],
     posts: [],
     singlePost: "",
+    loading: false,
   };
   componentDidMount() {
     this.getCategories();
     this.getPost();
   }
+  componentWillUnmount() {
+    // fix Warning: Can't perform a React state update on an unmounted component
+    this.setState = (state,callback)=>{
+        return;
+    };
+}
   getCategories = () => {
+    this.setState({loading: true});
     let url = "/forum/category/" + this.state.selectedGroup;
     api
       .get(url)
       .then((res) => {
-        this.setState({ selectedGroupCategories: res.data.categories });
+        this.setState({ selectedGroupCategories: res.data.categories, loading: false });
       })
       .catch((err) => {
+        this.setState({loading: false})
         console.log(err);
       });
   };
@@ -49,6 +59,7 @@ class Forum extends React.Component {
       });
   };
   createPost = () => {
+    this.setState({loading: true});
     api
       .post("/forum/post", {
         group: this.state.selectedGroup == "" ? null : this.state.selectedGroup,
@@ -59,13 +70,15 @@ class Forum extends React.Component {
         requiredPermission: "Create Posts",
       })
       .then((res) => {
-        console.log(res);
+        this.getPost()
+        this.setState({loading: false, group: "", category: "", topic: "", title: "", content: ""})
       })
       .catch((err) => {
-        console.log(err);
+        this.setState({loading: false})
       });
   };
   getPost = () => {
+    this.setState({loading: true});
     api
       .post("forum/post/filter", {
         group: this.state.filtergroup,
@@ -73,15 +86,21 @@ class Forum extends React.Component {
         topic: this.state.filtertopic,
       })
       .then((res) => {
-        this.setState({ posts: res.data?.posts });
+        this.setState({ posts: res.data?.posts, loading: false });
       })
       .catch((err) => {
         console.log(err);
+        this.setState({loading: false})
+
       });
   };
   setSingle = (id) => {
     this.setState({ singlePost: id });
   };
+  updateSingle = (id) => {
+    const post = this.state.posts.find(ele => ele._id === id);
+    console.log(post)
+  }
   render() {
     return (
       <div
@@ -106,12 +125,12 @@ class Forum extends React.Component {
               className="filter-button"
               value={this.state.filtergroup}
               onChange={(e) => {
-                this.setState({ filtergroup: e.target.value }, ()=>{
-                  this.getPost()
+                this.setState({ filtergroup: e.target.value }, () => {
+                  this.getPost();
                 });
               }}
             >
-              <option value="">Group</option>
+              <option value="">Select Group</option>
               {this.props.user?.groups?.map((group, key) => {
                 return (
                   <option key={key} value={group._id}>
@@ -120,31 +139,37 @@ class Forum extends React.Component {
                 );
               })}
             </select>
-           
-        
           </div>
         </div>
-        {this.state.singlePost == "" ? (
-          <div className="row mx-0 mt-3 justify-content-center post-row">
-            {this.state.posts.length === 0 && <p>No posts found</p>}
-            {this.state.posts.map((post, key) => {
-              return (
-                <PostTile
-                  post={post}
-                  key={key}
-                  refresh={this.getPost}
-                  viewPost={this.setSingle}
-                />
-              );
-            })}
-          </div>
+        {this.state.loading ? (
+          <Loader />
         ) : (
-          <SinglePost
-            back={this.setSingle}
-            post={this.state.singlePost}
-            refresh={this.getPost}
-          />
+          <React.Fragment>
+            {this.state.singlePost == "" ? (
+              <div className="row mx-0 mt-3 justify-content-center post-row">
+                {this.state.posts.length === 0 && <p>No posts found</p>}
+                {this.state.posts.map((post, key) => {
+                  return (
+                    <PostTile
+                      post={post}
+                      key={key}
+                      refresh={this.getPost}
+                      viewPost={this.setSingle}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <SinglePost
+                back={this.setSingle}
+                post={this.state.singlePost}
+                refresh={this.getPost}
+                updateSingle={this.updateSingle}
+              />
+            )}
+          </React.Fragment>
         )}
+
         <Modal target="createpost" heading="Ask a Question/ Discuss">
           <form>
             <div className="form-group">
@@ -234,12 +259,13 @@ class Forum extends React.Component {
             </div>
             <button
               className="btn btn-primary add-button mt-2"
+              data-bs-dismiss="modal"
               onClick={(e) => {
                 e.preventDefault();
                 this.createPost();
               }}
             >
-              Join
+              Create
             </button>
           </form>
         </Modal>

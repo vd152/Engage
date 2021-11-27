@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Auth from "../components/Auth/Auth";
-import Main from "../components/Main";
+import Home from "../components/Home";
 import PrivateRoute from "./privateRoutes";
 import PublicRoute from "./publicRoutes";
 import { connect } from "react-redux";
@@ -15,6 +15,7 @@ import Profile from "../components/Profile";
 import Manage from "../components/UsersRoles";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "../components/Main/Loader";
 class router extends React.Component {
   componentDidMount() {
     if (getUser()) {
@@ -23,12 +24,13 @@ class router extends React.Component {
     }
   }
   render() {
+    if(this.props.loading) return <Loader />
     return (
       <React.Fragment>
         <Router>
           <Switch>
             <PublicRoute exact path="/login" component={Auth} />
-            <PrivateRoute exact path="/" component={Main} />
+            <Route exact path="/" component={Home} />
             <PrivateRoute exact path="/groups" component={Groups} />
             <PrivateRoute exact path="/schedule" component={Schedule} />
             <PrivateRoute exact path="/forum" component={Forum} />
@@ -55,6 +57,7 @@ class router extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.currentUser.user,
+    loading: state.currentUser.loading
   };
 };
 export default connect(mapStateToProps, { currentUser, getForumCategories })(

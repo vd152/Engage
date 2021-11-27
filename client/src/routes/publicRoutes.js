@@ -10,7 +10,7 @@ const PublicRoute = ({ component: Component, ...rest }) => (
           <Component {...props} />
         </React.Fragment>
       ) : (
-        <Redirect to='/' />
+        <Redirect to='/profile' />
       )
     }
   />

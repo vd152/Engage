@@ -6,6 +6,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import Modal from "../Modal";
 import api from "../../apis/api";
 import { currentUser } from "../../redux/actions/UserActions";
+import {setActive} from "../../redux/actions/SidebarActions"
 import Loader from "../Main/Loader";
 import { toast } from 'react-toastify';
 
@@ -16,6 +17,7 @@ class Profile extends React.Component {
     loading: false,
   };
   componentDidMount() {
+    this.props.setActive("Profile")
     this.setState({ user: this.props.user });
   }
   setData = (key, value) => {
@@ -197,4 +199,4 @@ const mapStateToProps = (state) => {
     user: state.currentUser.user,
   };
 };
-export default connect(mapStateToProps, { currentUser })(Profile);
+export default connect(mapStateToProps, { currentUser, setActive })(Profile);

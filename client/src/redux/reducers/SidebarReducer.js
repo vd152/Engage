@@ -1,6 +1,6 @@
 import * as actionTypes from '../constants/SidebarConstants';
 
-export const sidebarReducer = (state={active: window.location.pathname=="/"?"Home":""}, action) => {
+export const sidebarReducer = (state={active: ""}, action) => {
     switch(action.type) {
             case actionTypes.SET_ACTIVE:
                 return {
