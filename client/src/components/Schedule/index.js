@@ -1,5 +1,5 @@
 import React from "react";
-import { FaAngleDown } from "react-icons/fa";
+import { FaAngleDown, FaTrashAlt } from "react-icons/fa";
 import { connect } from "react-redux";
 import Modal from "../Modal";
 import DateTimePicker from "react-datetime-picker";
@@ -7,9 +7,9 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import api from "../../apis/api";
-import {setActive} from '../../redux/actions/SidebarActions'
+import { setActive } from "../../redux/actions/SidebarActions";
 import Loader from "../Main/Loader";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 class Schedule extends React.Component {
   state = {
     selectedSchedule: "",
@@ -45,51 +45,73 @@ class Schedule extends React.Component {
             <button
               className="row-btn"
               data-bs-toggle="modal"
-              data-bs-target={row.mode == "owner"?"#viewvotes": "#castvote"}
+              data-bs-target={row.mode == "owner" ? "#viewvotes" : "#castvote"}
               onClick={(e) => {
-                e.preventDefault()
-                this.setState({selectedSchedule: row._id},()=>{
-                  if(row.mode === "owner") this.getVotes()
-                })
+                e.preventDefault();
+                this.setState({ selectedSchedule: row._id }, () => {
+                  if (row.mode === "owner") this.getVotes();
+                });
               }}
-            >{row.mode == "owner"? "View Selections": "Select Mode"}</button>
+            >
+              {row.mode == "owner" ? "View Selections" : "Select Mode"}
+            </button>
           ),
+        },
+        {
+          cell: (row) =>
+            this.props.user._id === row.owner?._id ||
+            this.props.user.isAdmin ? (
+              <button
+                className="row-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.deleteSchedule(row);
+                }}
+              >
+                <FaTrashAlt />
+              </button>
+            ) : (
+              ""
+            ),
         },
       ],
       data: [],
     },
     offlinevotes: [],
-    onlinevotes: []
+    onlinevotes: [],
   };
   componentDidMount() {
-    if(this.props.location.groupid){
+    if (this.props.location.groupid) {
       this.props.setActive("Schedule");
 
-      let group = this.props.user?.groups.find(ele=> ele._id === this.props.location.groupid)
-      this.setState({selectedGroup: group, selectedGroupName: group.name},()=>this.handleSelect())
-
+      let group = this.props.user?.groups.find(
+        (ele) => ele._id === this.props.location.groupid
+      );
+      this.setState(
+        { selectedGroup: group, selectedGroupName: group.name },
+        () => this.handleSelect()
+      );
     }
   }
   createSchedule = () => {
-    this.setState({loader: true})
+    this.setState({ loader: true });
     api
       .post("/schedule", {
         from: this.state.from,
         to: this.state.to,
         group: this.state.selectedGroup._id,
-        totalSeats: this.state.selectedGroup.users.length ,
+        totalSeats: this.state.selectedGroup.users.length,
         requiredPermission: "Create Schedule",
       })
       .then((res) => {
-        this.handleSelect()
-        toast("Schedule created")
-        this.setState({loader: false})
+        this.handleSelect();
+        toast("Schedule created");
+        this.setState({ loader: false });
       })
       .catch((err) => {
         toast.error(`${err.response?.data?.message}`);
 
-        this.setState({loader: false})
-
+        this.setState({ loader: false });
       });
   };
   handleSelect = () => {
@@ -101,13 +123,28 @@ class Schedule extends React.Component {
       .then((res) => {
         res.data.schedule.forEach((val) => {
           let temp = {
-            from: new Date(val.from).toLocaleDateString("en-GB") + " " +new Date(val.from).toLocaleTimeString('en-US', { hour: 'numeric',minute: 'numeric', hour12: true }),
-            to: new Date(val.to).toLocaleDateString("en-GB") + " " +new Date(val.to).toLocaleTimeString('en-US', { hour: 'numeric',minute: 'numeric', hour12: true }),
+            from:
+              new Date(val.from).toLocaleDateString("en-GB") +
+              " " +
+              new Date(val.from).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              }),
+            to:
+              new Date(val.to).toLocaleDateString("en-GB") +
+              " " +
+              new Date(val.to).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              }),
             _id: val?._id,
             createdBy: val.createdBy?.firstName + " " + val.createdBy?.lastName,
+            owner: val.createdBy,
           };
-          if(val.createdBy?._id == this.props.user?._id){
-            temp.mode = "owner"
+          if (val.createdBy?._id == this.props.user?._id) {
+            temp.mode = "owner";
           }
           datalist.push(temp);
         });
@@ -118,35 +155,72 @@ class Schedule extends React.Component {
       .catch((err) => {
         toast.error(`${err.response?.data?.message}`);
 
-        this.setState({ loading: false,loader: false });
+        this.setState({ loading: false, loader: false });
       });
   };
   vote = () => {
-    this.setState({loader: true})
+    this.setState({ loader: true });
 
-    api.post('/schedule/vote', {id: this.state.selectedSchedule, mode: this.state.mode}).then(res=>{
-      toast("Voted successfully")
-      this.setState({loader: false})
+    api
+      .post("/schedule/vote", {
+        id: this.state.selectedSchedule,
+        mode: this.state.mode,
+      })
+      .then((res) => {
+        toast("Voted successfully");
+        this.setState({ loader: false });
+      })
+      .catch((err) => {
+        toast.error(`${err.response?.data?.message}`);
 
-    }).catch(err=>{
-      toast.error(`${err.response?.data?.message}`);
-
-      this.setState({loader: false})
-
-    })
-  }
+        this.setState({ loader: false });
+      });
+  };
   getVotes = () => {
-
-    api.post('/schedule/vote/get', {id: this.state.selectedSchedule}).then(res=>{
-      this.setState({offlinevotes: res.data?.offline, onlinevotes: res.data?.online})
-    }).catch((err=>{
-      toast.error(`${err.response?.data?.message}`);
-
-
-    }))
-  }
+    api
+      .post("/schedule/vote/get", { id: this.state.selectedSchedule })
+      .then((res) => {
+        this.setState({
+          offlinevotes: res.data?.offline,
+          onlinevotes: res.data?.online,
+        });
+      })
+      .catch((err) => {
+        toast.error(`${err.response?.data?.message}`);
+      });
+  };
+  deleteSchedule = (row) => {
+    this.setState({ loader: true });
+    if (this.props.user?._id === row.owner?._id) {
+      let url = "/schedule/" + row._id;
+      api
+        .delete(url)
+        .then((res) => {
+          toast("Scheduled class deleted");
+          this.handleSelect();
+          this.setState({ loader: false });
+        })
+        .catch((err) => {
+          toast.error(`${err.response?.data?.message}`);
+          this.setState({ loader: false });
+        });
+    } else if (this.props.user.isAdmin) {
+      let url = "/schedule/admin/" + row._id;
+      api
+        .post(url, { requiredPermission: "Delete Schedule" })
+        .then((res) => {
+          toast("Scheduled class deleted");
+          this.handleSelect();
+          this.setState({ loader: false });
+        })
+        .catch((err) => {
+          toast.error(`${err.response?.data?.message}`);
+          this.setState({ loader: false });
+        });
+    }
+  };
   render() {
-    if(this.state.loader) return <Loader />
+    if (this.state.loader) return <Loader />;
     return (
       <div
         className={
@@ -270,32 +344,44 @@ class Schedule extends React.Component {
           <div className="row  justify-content-between">
             <div className="col-6 text-center">
               <h6>Offline ({this.state.offlinevotes.length})</h6>
-              {this.state.offlinevotes?.map((vote,key)=>{
-                return <p key={key} >{vote.id?.firstName + " "+ vote.id?.lastName}</p>
+              {this.state.offlinevotes?.map((vote, key) => {
+                return (
+                  <p key={key}>
+                    {vote.id?.firstName + " " + vote.id?.lastName}
+                  </p>
+                );
               })}
             </div>
             <div className="col-6 text-center">
-            <h6>Online ({this.state.onlinevotes.length})</h6>
-              {this.state.onlinevotes?.map((vote,key)=>{
-                return <p key={key} >{vote.id?.firstName + " "+ vote.id?.lastName}</p>
+              <h6>Online ({this.state.onlinevotes.length})</h6>
+              {this.state.onlinevotes?.map((vote, key) => {
+                return (
+                  <p key={key}>
+                    {vote.id?.firstName + " " + vote.id?.lastName}
+                  </p>
+                );
               })}
             </div>
           </div>
         </Modal>
         <Modal target="castvote" heading="Select Class Mode">
-          
-          <form >
+          <form>
             <div className="form-group">
-            <label className="form-label">choose mode: </label>
+              <label className="form-label">choose mode: </label>
 
-              <select className="form-control"
-               value={this.state.mode} onChange={(e) =>{
-                this.setState({mode: e.target.value})
-               }}>
+              <select
+                className="form-control"
+                value={this.state.mode}
+                onChange={(e) => {
+                  this.setState({ mode: e.target.value });
+                }}
+              >
                 <option value="online">Online</option>
-                {this.props.user?.vaccinationStatus &&
-                <option value="offline">Offline</option>}
+                {this.props.user?.vaccinationStatus && (
+                  <option value="offline">Offline</option>
+                )}
               </select>
+              <span className="text-muted">Students with verified vaccination status can only vote for offline classes.</span>
             </div>
             <button
               className="btn btn-primary add-button mt-2"
@@ -318,4 +404,4 @@ const mapStateToProps = (state) => {
     user: state.currentUser.user,
   };
 };
-export default connect(mapStateToProps, {setActive})(Schedule);
+export default connect(mapStateToProps, { setActive })(Schedule);

@@ -4,15 +4,6 @@ import {scanImageData} from "zbar.wasm";
 
 const SCAN_PERIOD_MS = 1000;
 
-// function hasGetUserMedia() {
-//     return !!(
-//         (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
-//         navigator.webkitGetUserMedia ||
-//         navigator.mozGetUserMedia ||
-//         navigator.msGetUserMedia
-//     );
-// }
-
 export default class QRScanner extends Component {
     static defaultProps = {
         className: '',
@@ -58,30 +49,11 @@ export default class QRScanner extends Component {
 
 
     }
-
-    // componentWillUpdate(nextProps) {
-    //     if (
-    //         JSON.stringify(nextProps.videoConstraints) !==
-    //         JSON.stringify(this.props.videoConstraints)
-    //     ) {
-    //         this.requestUserMedia();
-    //     }
-    // }
-
     componentWillUnmount() {
         clearInterval(QRScanner.scanTimer);
         const index = QRScanner.mountedInstances.indexOf(this);
         QRScanner.mountedInstances.splice(index, 1);
 
-        // QRScanner.userMediaRequested = false;
-        // if (QRScanner.mountedInstances.length === 0 && this.state.hasUserMedia) {
-        //     if (this.stream.getVideoTracks && this.stream.getAudioTracks) {
-        //         this.stream.getVideoTracks().map(track => track.stop());
-        //     } else {
-        //         this.stream.stop();
-        //     }
-        //     window.URL.revokeObjectURL(this.state.src);
-        // }
     }
 
     scanBarcode = async () => {

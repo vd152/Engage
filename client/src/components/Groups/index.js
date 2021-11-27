@@ -34,6 +34,7 @@ class Groups extends React.Component {
       .then((res) => {
         toast("Group created successfully")
         this.getGroups()
+        window.location.reload()
         this.setState({loading: false})
       })
       .catch((err) => {
@@ -71,14 +72,14 @@ class Groups extends React.Component {
         requiredPermission: "Edit Groups",
       })
       .then((res) => {
-        this.getGroups();
-        this.setLoading(false);
         toast("Group edited successfully");
+        this.setLoading(false);
       })
       .catch((err) => {
-        this.getGroups();
         toast.error(`${err.response?.data?.message}`);
         this.setLoading(false);
+      }).then(()=>{
+        this.getGroups()
       });
   };
   

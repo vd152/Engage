@@ -69,7 +69,7 @@ exports.deleteRole = async (req, res) => {
 exports.editRole = async (req, res) => {
   const { role } = req.body;
   const id = req.params.id;
-
+  let name = role.name
   let foundRole;
   try {
     foundRole = await Role.findOne({ _id: id });
@@ -83,7 +83,19 @@ exports.editRole = async (req, res) => {
       message: "Role not found.",
     });
   }
-
+  let checkRole;
+  try {
+    checkRole = await Role.findOne({ name});
+  } catch (err) {
+    return res.status(500).json({
+      message: "something went wrong",
+    });
+  }
+  if (checkRole && !checkRole._id.equals(foundRole._id)) {
+    return res.status(404).json({
+      message: "Role name already exists.",
+    });
+  }
   let newRole = { foundRole, ...role };
 
   Role.findOneAndUpdate({ _id: id }, { $set: newRole }, { new: true })

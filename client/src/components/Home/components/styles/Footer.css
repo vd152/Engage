@@ -1,0 +1,27 @@
+.footer {
+  background: #37398a;
+  padding: 4rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.social {
+  margin-top: 3rem;
+}
+
+.social a {
+  margin: 0 1rem;
+}
+.social svg{
+  font-size:2em;
+  color: #fff;
+}
+.social a:hover svg{
+  color: rgba(255, 255, 255, 0.788);
+}
+.footer p {
+  color: #fff;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}

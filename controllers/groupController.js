@@ -1,5 +1,6 @@
 const Group = require("../models/groupModel");
 const User = require("../models/userModel");
+const Schedule = require("../models/scheduleModel")
 exports.getGroups = async (req, res) => {
   Group.find()
     .then((groups) => {
@@ -196,7 +197,13 @@ exports.deleteGroup = async (req, res) => {
       message: "Group not found",
     });
   }
-
+  Schedule.deleteMany({group: id}).then(data=>{
+    console.log(data)
+  }).catch((err) =>{
+    return res.status(500).json({
+      message: "Something went wrong while deleting schedules"
+    })
+  })
   Group.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({

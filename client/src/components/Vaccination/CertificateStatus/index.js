@@ -3,9 +3,6 @@ import "./index.css";
 import CertificateValidImg from "../img/certificate-valid.svg";
 import CertificateInValidImg from "../img/certificate-invalid.svg";
 import NextArrowImg from "../img/next-arrow.svg";
-// import LearnProcessImg from "../../assets/img/leanr_more_small.png";
-// import FeedbackSmallImg from "../../assets/img/feedback-small.png";
-// import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
 import LoadingImg from "../img/loading.gif";
 import config from "../../../config";
 import {pathOr} from "ramda";
@@ -16,6 +13,7 @@ import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {ordinal_suffix_of} from "../../../utils/utils";
 import api from '../../../apis/api'
+import {toast} from 'react-toastify'
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -159,9 +157,12 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             console.log(details)
             api.post('/user/verify/vaccination', {details}).then(res=>{
                 console.log(res)
+                toast("Verified.")
                 window.location.reload()
             }).catch(err=>{
                 console.log(err)
+                toast.error(`${err.response?.data?.message}`);
+                window.location.reload()
             })
             return "Final Certificate for COVID-19 Vaccination"
         } else {
@@ -177,7 +178,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     }
 
     return (
-        isLoading ?<div className="loader-wrapper">
+        isLoading ?<div className="">
         <img src={LoadingImg}/>
 
     </div> : <div className="certificate-status-wrapper">
@@ -215,8 +216,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 </table>
             }
             <br/>
-            {!isValid &&
-            <button className="btn add-button m-3" onClick={goBack}>Verify Another Certificate</button>}
+            <button className="btn add-button m-3" onClick={goBack}>Verify Another Certificate</button>
             {/*<SmallInfoCards text={"Provide Feedback"}*/}
             {/*                onClick={() => {*/}
             {/*                    history.push("/side-effects")*/}

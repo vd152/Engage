@@ -7,32 +7,32 @@ const scheduleSchema = new mongoose.Schema(
       required: true,
     },
     to: {
-        type: Date,
-        required: true,
+      type: String,
+      required: true,
     },
     group: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'groups'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "groups",
     },
     users: [
-        {
-            id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'users'
-            },
-            mode: {
-                type: String,
-            }
-        }
+      {
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "users",
+        },
+        mode: {
+          type: String,
+        },
+      },
     ],
     totalSeats: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
-    }
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
   },
   { timestamps: true }
 );

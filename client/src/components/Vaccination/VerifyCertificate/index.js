@@ -3,7 +3,6 @@ import "./index.css";
 import {CertificateStatus} from "../CertificateStatus";
 import QRScanner from "../QRScanner";
 import JSZip from "jszip";
-import Container from "react-bootstrap/Container";
 export const CERTIFICATE_FILE = "certificate.json";
 
 

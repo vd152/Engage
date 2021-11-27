@@ -215,6 +215,13 @@ exports.deleteCategory = async (req, res) => {
       message: "Invalid request",
     });
   }
+  Category.deleteMany({parentCategory: id}).then(data=>{
+    console.log(data)
+  }).catch(err=>{
+    return res.status(500).json({
+      message: "Something went wrong.",
+    })
+  })
   Category.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({
@@ -470,6 +477,13 @@ exports.deletePost = async(req, res) => {
       message: "Unauthorized"
     })
   }
+  Comment.deleteMany({post: id}).then(data=>{
+    console.log(data)
+  }).catch(err => {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    })
+  })
   Post.deleteOne({_id: id}).then((data)=>{
     return res.status(200).json({
       data
@@ -495,6 +509,13 @@ exports.deletePostAdmin = async(req, res) => {
       message: "Post not found."
     })
   }
+  Comment.deleteMany({post: id}).then(data=>{
+    console.log(data)
+  }).catch(err => {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    })
+  })
   Post.deleteOne({_id: id}).then((data)=>{
     return res.status(200).json({
       data
