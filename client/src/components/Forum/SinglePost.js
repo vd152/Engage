@@ -1,9 +1,10 @@
 import React from "react";
-import {FaTrashAlt, FaThumbsUp } from "react-icons/fa";
+import { FaTrashAlt, FaThumbsUp } from "react-icons/fa";
 import { format } from "timeago.js";
 import { connect } from "react-redux";
 import api from "../../apis/api";
 import Loader from "../Main/Loader";
+import { toast } from "react-toastify";
 class SinglePost extends React.Component {
   state = {
     content: "",
@@ -11,22 +12,62 @@ class SinglePost extends React.Component {
     liked: false,
     loadingLike: false,
     loadingComments: false,
+    likes: 0,
   };
   componentDidMount() {
     this.getComments();
     this.setState({
       liked: this.props.post?.likes?.includes(this.props.user._id),
+      likes: this.props.post?.likes.length,
     });
+  }
+
+  deleteComment = (id) => {
+    this.setState({ loadingComments: true });
+    let url = "/forum/post/comment/" + id;
+    api
+      .delete(url)
+      .then((res) => {
+        toast("Comment deleted.");
+        this.setState({ loadingComments: false });
+        this.getComments();
+      })
+      .catch((err) => {
+        this.setState({ loadingComments: false });
+        toast.error(`${err.response?.data?.message}`);
+      });
+  };
+  deleteCommentAdmin = (id) => {
+    this.setState({ loadingComments: true });
+    let url = "/forum/post/comment/admin/" + id;
+    api
+      .post(url, {requiredPermission: "Delete Comments"})
+      .then((res) => {
+        toast("Comment deleted.");
+        this.setState({ loadingComments: false });
+        this.getComments();
+      })
+      .catch((err) => {
+        this.setState({ loadingComments: false });
+        toast.error(`${err.response?.data?.message}`);
+
+      });
   }
   likeTogglePost = () => {
     this.setState({ loadingLike: true });
     api
       .post("/forum/post/like", { id: this.props.post?._id })
       .then((res) => {
-        this.setState({ liked: !this.state.liked, loadingLike: false });
+        this.setState({ liked: !this.state.liked, loadingLike: false }, () => {
+          this.setState({
+            likes: this.state.liked
+              ? this.state.likes + 1
+              : this.state.likes - 1,
+          });
+        });
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(`${err.response?.data?.message}`);
         this.setState({ loadingLike: false });
       });
   };
@@ -39,7 +80,7 @@ class SinglePost extends React.Component {
         this.setState({ comments: res.data?.comments, loadingComments: false });
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(`${err.response?.data?.message}`);
         this.setState({ loadingComments: false });
       });
   };
@@ -52,12 +93,36 @@ class SinglePost extends React.Component {
       })
       .then((res) => {
         this.getComments();
+        toast("Comment added successfully");
         this.setState({ content: "" });
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(`${err.response?.data?.message}`);
       });
   };
+  deletePost = (id) => {
+    let url = '/forum/post/'+id
+    api.delete(url).then(res=>{
+      this.props.back("");
+      this.props.refresh();
+      toast("Post Deleted")
+    }).catch((err) => {
+      toast.error(`${err.response?.data?.message}`);
+
+    })
+  };
+  deletePostAdmin = (id) => {
+    let url = '/forum/post/admin/'+id
+    api.post(url, {requiredPermission: "Delete Posts"}).then(res=>{
+      this.props.back("");
+      this.props.refresh();
+      toast("Post Deleted")
+    }).catch((err) => {
+      toast.error(`${err.response?.data?.message}`);
+
+    })
+  };
+
   render() {
     return (
       <>
@@ -81,7 +146,7 @@ class SinglePost extends React.Component {
             className="col-md-9 col-10 row  border  overflow-hidden flex-md-row mb-4  h-md-250 position-relative"
             style={{ height: "fit-content" }}
           >
-            <div className="col p-4 d-flex flex-column position-static">
+            <div className="col-md-10  col-10 p-4 d-flex flex-column position-static">
               <strong className="d-inline-block mb-2 top-text">
                 {this.props.post?.category?.name} &gt;{" "}
                 {this.props.post?.topic?.name}
@@ -100,20 +165,36 @@ class SinglePost extends React.Component {
                   this.props.post.createdBy?.email}
               </div>
             </div>
-            <div className="col-auto d-flex flex-column align-items-center justify-content-center">
+            <div className=" col-md-2 col-1 d-flex flex-column align-items-end justify-content-center">
               {this.state.loadingLike ? (
                 <Loader height="50" width="50" />
               ) : (
-                <FaThumbsUp
-                  className="post-icon"
-                  style={{
-                    color: this.state.liked ? "red" : "black",
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.likeTogglePost();
-                  }}
-                />
+                <React.Fragment>
+                  <div className="d-flex align-items-center">
+                    <span className="m-1">{this.state.likes}</span>
+                    <FaThumbsUp
+                      className="post-icon m-1"
+                      style={{
+                        color: this.state.liked ? "red" : "black",
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.likeTogglePost();
+                      }}
+                    />
+                  </div>
+                  {(this.props.post?.createdBy?._id === this.props.user?._id || this.props.user?.isAdmin) &&
+                  <FaTrashAlt
+                    className="post-icon m-1 mt-3"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if(this.props.post?.createdBy?._id === this.props.user?._id)
+                        this.deletePost(this.props.post._id);
+                      else if(this.props.user?.isAdmin)
+                        this.deletePostAdmin(this.props.post._id)
+                    }}
+                  />}
+                </React.Fragment>
               )}
             </div>
             <hr />
@@ -151,23 +232,36 @@ class SinglePost extends React.Component {
                   {this.state.comments.map((comment, key) => {
                     return (
                       <div className="row comment-bg justify-content-between">
-                      <div className="col-9 " key={key}>
-                        <p className=" m-0">
-                          {comment.user?.firstName +
-                            " " +
-                            comment.user?.lastName +
-                            " " +
-                            comment.user?.email}{" "}
-                          -{" "}
-                          <span className="text-muted">
-                            {format(comment.createdAt)}
-                          </span>
-                        </p>
-                        <p className="m-0">{comment.content}</p>
-                      </div>
-                      <div className="col-2">
-                        <button className="btn"><FaTrashAlt/></button>
-                      </div>
+                        <div className="col-9 col-md-11" key={key}>
+                          <p className=" m-0">
+                            {comment.user?.firstName +
+                              " " +
+                              comment.user?.lastName +
+                              " " +
+                              comment.user?.email}{" "}
+                            -{" "}
+                            <span className="text-muted">
+                              {format(comment.createdAt)}
+                            </span>
+                          </p>
+                          <p className="m-0">{comment.content}</p>
+                        </div>
+                        {(comment.user?._id === this.props.user?._id || this.props.user?.isAdmin) && (
+                          <div className="col-2 col-md-1">
+                            <button
+                              className="btn"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if(comment.user?._id === this.props.user?._id)
+                                  this.deleteComment(comment?._id);
+                                else if (this.props.user?.isAdmin)
+                                  this.deleteCommentAdmin(comment._id)
+                              }}
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

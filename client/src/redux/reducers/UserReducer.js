@@ -1,6 +1,6 @@
 import * as actionTypes from '../constants/UserConstants';
 
-export const userReducer = (state={loading: false , user:{}}, action) => {
+export const userReducer = (state={loading: false , user:{isAdmin: false}}, action) => {
     switch(action.type) {
             case actionTypes.USER_REQUEST:
                 return {

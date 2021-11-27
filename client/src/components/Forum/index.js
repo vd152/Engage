@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import api from "../../apis/api";
 import SinglePost from "./SinglePost";
 import Loader from "../Main/Loader";
+import { toast } from "react-toastify";
 class Forum extends React.Component {
   state = {
     selectedGroup: "none",
@@ -71,9 +72,12 @@ class Forum extends React.Component {
       })
       .then((res) => {
         this.getPost()
+        toast("Post created")
         this.setState({loading: false, group: "", category: "", topic: "", title: "", content: ""})
       })
       .catch((err) => {
+        toast.error(`${err.response?.data?.message}`);
+
         this.setState({loading: false})
       });
   };
@@ -164,7 +168,6 @@ class Forum extends React.Component {
                 back={this.setSingle}
                 post={this.state.singlePost}
                 refresh={this.getPost}
-                updateSingle={this.updateSingle}
               />
             )}
           </React.Fragment>

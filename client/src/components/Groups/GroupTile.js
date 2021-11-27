@@ -3,7 +3,6 @@ import { Redirect } from "react-router";
 import { FaTrashAlt, FaPencilAlt } from "react-icons/fa";
 import api from "../../apis/api";
 import { toast } from "react-toastify";
-import Modal from "../Modal";
 class GroupTile extends React.Component {
 
   constructor(props){

@@ -156,8 +156,8 @@ class Profile extends React.Component {
             </div>
           </form>
           <>
-            {!this.props.user?.vaccinationStatus && (
               <div className="col-md-4 m-3">
+            {!this.props.user?.vaccinationStatus && (
                 <div className="form-group">
                   <label className="form-label m-1">Vaccination Status</label>
                   <button
@@ -168,8 +168,8 @@ class Profile extends React.Component {
                     Vaccination certificate verification
                   </button>
                 </div>
-              </div>
             )}
+              </div>
             {!this.state.disabled && (
               <div className="col-md-4 m-1 px-5 text-end">
                 <div className="form-group text-right">

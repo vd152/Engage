@@ -159,8 +159,9 @@ exports.createPost = async (req, res) => {
       message: "Please fill all the required fields.",
     });
   }
+  console.log(group)
   const post = new Post({
-    group,
+    group: group=="none"?null:group,
     category,
     topic,
     title,
@@ -392,3 +393,115 @@ exports.getCommentsByPost = async (req, res) => {
       });
     });
 };
+exports.deleteComment = async(req, res) => {
+  const id = req.params.id
+  let foundComment;
+  try{
+    foundComment = await Comment.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong",
+    })
+  }
+  if(!foundComment){
+    return res.status(404).json({
+      message: "Comment not found",
+    })
+  }
+  if(!foundComment.user.equals(req.user._id)){
+    return res.status(401).json({
+      message: "Unauthorized"
+    })
+  }
+
+  Comment.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+}
+exports.deleteCommentAdmin = async(req, res) => {
+  const id = req.params.id
+  let foundComment;
+  try{
+    foundComment = await Comment.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong",
+    })
+  }
+  if(!foundComment){
+    return res.status(404).json({
+      message: "Comment not found",
+    })
+  }
+
+  Comment.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+}
+exports.deletePost = async(req, res) => {
+  const id = req.params.id
+  let foundPost;
+  try{
+    foundPost = await Post.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  }
+  if(!foundPost){
+    return res.status(404).json({
+      message: "Post not found."
+    })
+  }
+  if(!foundPost.createdBy._id.equals(req.user._id)){
+    return res.status(401).json({
+      message: "Unauthorized"
+    })
+  }
+  Post.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+}
+exports.deletePostAdmin = async(req, res) => {
+  const id = req.params.id
+  let foundPost;
+  try{
+    foundPost = await Post.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  }
+  if(!foundPost){
+    return res.status(404).json({
+      message: "Post not found."
+    })
+  }
+  Post.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+}

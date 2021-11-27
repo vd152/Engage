@@ -20,8 +20,11 @@ router.post('/post/filter', passport.authenticate('jwt',{session: false}), contr
 router.post('/post/like', passport.authenticate('jwt',{session: false}), controller.likeForumPost)
 router.post('/post/comment', passport.authenticate('jwt',{session: false}), checkPermission, controller.createComment)
 router.post('/post/comment/:postid', passport.authenticate('jwt',{session: false}), controller.getCommentsByPost)
+router.delete('/post/comment/:id', passport.authenticate('jwt',{session: false}), controller.deleteComment)
+router.post('/post/comment/admin/:id', passport.authenticate('jwt',{session: false}),checkPermission, controller.deleteCommentAdmin)
 
-
+router.delete('/post/:id', passport.authenticate('jwt',{session: false}), controller.deletePost)
+router.post('/post/admin/:id', passport.authenticate('jwt',{session: false}), checkPermission, controller.deletePostAdmin)
 
 router.post('/delete/category', passport.authenticate('jwt',{session: false}), checkPermission, controller.deleteCategory);
 

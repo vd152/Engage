@@ -142,8 +142,10 @@ exports.editUser = async (req, res) => {
       message: "User not found.",
     });
   }
-
   let newUser = { foundUser, ...user };
+  if(foundUser.firstName !== user.firstName || foundUser.lastName !== user.lastName) {
+    newUser.vaccinationStatus = false
+  }
   User.findOneAndUpdate({ _id: id }, { $set: newUser }, { new: true })
     .select("-password")
     .then((updateduser) => {

@@ -96,7 +96,7 @@ class Sidebar extends React.Component {
               Forum
             </div>
           </div>
-          {this.props.user?.role?.name.toLowerCase().includes("admin")  &&
+          {this.props.user?.isAdmin  &&
 
           <div
             className="sideNavlink"

@@ -36,7 +36,10 @@ class PostTile extends React.Component {
             {this.props.post?.category?.name} &gt;{" "}
             {this.props.post?.topic?.name}
           </strong>
-          <h3 className="mb-0">{this.props.post?.title}</h3>
+          <h3 className="mb-0" onClick={(e) => {
+              e.preventDefault();
+              this.props.viewPost(this.props.post);
+            }} style={{cursor: "pointer"}}>{this.props.post?.title}</h3>
           <div className="mb-1 text-muted">
             {format(this.props.post?.createdAt)}
           </div>

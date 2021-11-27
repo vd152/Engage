@@ -10,6 +10,7 @@ exports.createSchedule = async (req, res) => {
   let scheduleFound;
   try {
     scheduleFound = await Schedule.findOne({
+      group: group,
       from: { $lte: (to) },
       to: { $gte: (from) },
     });
