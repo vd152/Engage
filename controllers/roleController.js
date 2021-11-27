@@ -13,6 +13,7 @@ exports.getRoles = async (req, res) => {
       });
     });
 };
+
 exports.addRole = async (req, res) => {
   const { name, permissions } = req.body;
 
@@ -54,22 +55,22 @@ exports.addRole = async (req, res) => {
 exports.deleteRole = async (req, res) => {
   const id = req.body.id;
   let foundRole;
-  try{
-    foundRole = await Role.findOne({_id: id})
-  }catch (err) {
+  try {
+    foundRole = await Role.findOne({ _id: id });
+  } catch (err) {
     return res.status(500).json({
-      message: "Something went wrong"
-    })
+      message: "Something went wrong",
+    });
   }
-  if(!foundRole){
+  if (!foundRole) {
     return res.status(404).json({
-      message: "Role not found"
-    })
+      message: "Role not found",
+    });
   }
-  if(foundRole.name === "admin"){
+  if (foundRole.name === "admin") {
     return res.status(401).json({
-      message: "You cannot delete the admin role"
-    })
+      message: "You cannot delete the admin role",
+    });
   }
   Role.deleteOne({ _id: id })
     .then((data) => {
@@ -87,7 +88,7 @@ exports.deleteRole = async (req, res) => {
 exports.editRole = async (req, res) => {
   const { role } = req.body;
   const id = req.params.id;
-  let name = role.name
+  let name = role.name;
   let foundRole;
   try {
     foundRole = await Role.findOne({ _id: id });
@@ -103,7 +104,7 @@ exports.editRole = async (req, res) => {
   }
   let checkRole;
   try {
-    checkRole = await Role.findOne({ name});
+    checkRole = await Role.findOne({ name });
   } catch (err) {
     return res.status(500).json({
       message: "something went wrong",

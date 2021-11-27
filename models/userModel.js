@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
     lastName: {
       type: String,
     },
-    email: { 
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -30,19 +30,19 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'roles',
-      required: true
+      ref: "roles",
+      required: true,
     },
     groups: [
-      { 
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'groups'
-      }
+        ref: "groups",
+      },
     ],
     vaccinationStatus: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -1,6 +1,42 @@
 const Category = require("../models/categoryModel");
 const Post = require("../models/forumPostModel");
 const Comment = require("../models/commentModel");
+
+
+//Forum Categories
+exports.getAllCategories = async (req, res) => {
+  Category.find({ categoryType: "root" })
+    .populate("group")
+    .then((categories) => {
+      res.status(200).json({
+        categories,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
+
+exports.getCategoriesByGroup = async (req, res) => {
+  const groupid = req.params.groupid;
+  Category.find({
+    categoryType: "root",
+    group: groupid == "none" ? null : groupid,
+  })
+    .then((categories) => {
+      return res.status(200).json({
+        categories,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
+
 exports.createCategory = async (req, res) => {
   const { name, group } = req.body;
   if (!name) {
@@ -45,12 +81,40 @@ exports.createCategory = async (req, res) => {
       });
     });
 };
-exports.getAllCategories = async (req, res) => {
-  Category.find({ categoryType: "root" })
-    .populate("group")
-    .then((categories) => {
-      res.status(200).json({
-        categories,
+
+exports.editCategory = async (req, res) => {
+  const { name, group } = req.body;
+  const id = req.params.id;
+
+  if (!name) {
+    return res.status(422).json({
+      message: "Please fill all the required fields.",
+    });
+  }
+
+  let catExists;
+  try {
+    catExists = await Category.findOne({ name });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    });
+  }
+
+  if (catExists && !catExists._id.equals(id)) {
+    return res.status(400).json({
+      message: "Category already exists",
+    });
+  }
+
+  Category.findOneAndUpdate(
+    { _id: id },
+    { $set: { name: name, group: group } },
+    { new: true }
+  )
+    .then((updatedcat) => {
+      return res.status(200).json({
+        category: updatedcat,
       });
     })
     .catch((err) => {
@@ -59,6 +123,65 @@ exports.getAllCategories = async (req, res) => {
       });
     });
 };
+
+exports.deleteCategory = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(422).json({
+      message: "Invalid request",
+    });
+  }
+  Category.deleteMany({parentCategory: id}).then(data=>{
+    console.log(data)
+  }).catch(err=>{
+    return res.status(500).json({
+      message: "Something went wrong.",
+    })
+  })
+  Category.deleteOne({ _id: id })
+    .then((data) => {
+      return res.status(200).json({
+        data,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
+
+//Forum Topics
+exports.getAllTopics = async (req, res) => {
+  Category.find({ categoryType: "topic" })
+    .populate("parentCategory")
+    .then((topics) => {
+      res.status(200).json({
+        topics,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
+
+exports.getTopicsByCategory = async (req, res) => {
+  const categoryid = req.params.categoryid;
+  Category.find({ categoryType: "topic", parentCategory: categoryid })
+    .then((topics) => {
+      return res.status(200).json({
+        topics,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};
+
 exports.createTopic = async (req, res) => {
   const { name, parentCategory } = req.body;
   if (!name || !parentCategory) {
@@ -103,30 +226,39 @@ exports.createTopic = async (req, res) => {
     });
 };
 
-exports.getAllTopics = async (req, res) => {
-  Category.find({ categoryType: "topic" })
-    .populate("parentCategory")
-    .then((topics) => {
-      res.status(200).json({
-        topics,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
+exports.editTopic = async (req, res) => {
+  const { name, parentCategory } = req.body;
+  const id = req.params.id;
 
-exports.getCategoriesByGroup = async (req, res) => {
-  const groupid = req.params.groupid;
-  Category.find({
-    categoryType: "root",
-    group: groupid == "none" ? null : groupid,
-  })
-    .then((categories) => {
+  if (!name || !parentCategory) {
+    return res.status(422).json({
+      message: "Please fill all the required fields.",
+    });
+  }
+
+  let catExists;
+  try {
+    catExists = await Category.findOne({ name });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    });
+  }
+
+  if (catExists && !catExists._id.equals(id)) {
+    return res.status(400).json({
+      message: "Category already exists",
+    });
+  }
+
+  Category.findOneAndUpdate(
+    { _id: id },
+    { $set: { name: name, parentCategory: parentCategory } },
+    { new: true }
+  )
+    .then((updatedtopic) => {
       return res.status(200).json({
-        categories,
+        category: updatedtopic,
       });
     })
     .catch((err) => {
@@ -136,21 +268,7 @@ exports.getCategoriesByGroup = async (req, res) => {
     });
 };
 
-exports.getTopicsByCategory = async (req, res) => {
-  const categoryid = req.params.categoryid;
-  Category.find({ categoryType: "topic", parentCategory: categoryid })
-    .then((topics) => {
-      return res.status(200).json({
-        topics,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
-
+//Forum Posts
 exports.createPost = async (req, res) => {
   const { group, category, topic, title, content } = req.body;
   let createdBy = req.user._id;
@@ -208,255 +326,6 @@ exports.getPostFilter = async (req, res) => {
     });
 };
 
-exports.deleteCategory = async (req, res) => {
-  const { id } = req.body;
-  if (!id) {
-    return res.status(422).json({
-      message: "Invalid request",
-    });
-  }
-  Category.deleteMany({parentCategory: id}).then(data=>{
-    console.log(data)
-  }).catch(err=>{
-    return res.status(500).json({
-      message: "Something went wrong.",
-    })
-  })
-  Category.deleteOne({ _id: id })
-    .then((data) => {
-      return res.status(200).json({
-        data,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
-exports.editCategory = async (req, res) => {
-  const { name, group } = req.body;
-  const id = req.params.id;
-
-  if (!name) {
-    return res.status(422).json({
-      message: "Please fill all the required fields.",
-    });
-  }
-
-  let catExists;
-  try {
-    catExists = await Category.findOne({ name });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Something went wrong.",
-    });
-  }
-
-  if (catExists && !catExists._id.equals(id)) {
-    return res.status(400).json({
-      message: "Category already exists",
-    });
-  }
-
-  Category.findOneAndUpdate(
-    { _id: id },
-    { $set: { name: name, group: group } },
-    { new: true }
-  )
-    .then((updatedcat) => {
-      return res.status(200).json({
-        category: updatedcat,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
-exports.editTopic = async (req, res) => {
-  const { name, parentCategory } = req.body;
-  const id = req.params.id;
-
-  if (!name || !parentCategory) {
-    return res.status(422).json({
-      message: "Please fill all the required fields.",
-    });
-  }
-
-  let catExists;
-  try {
-    catExists = await Category.findOne({ name });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Something went wrong.",
-    });
-  }
-
-  if (catExists && !catExists._id.equals(id)) {
-    return res.status(400).json({
-      message: "Category already exists",
-    });
-  }
-
-  Category.findOneAndUpdate(
-    { _id: id },
-    { $set: { name: name, parentCategory: parentCategory } },
-    { new: true }
-  )
-    .then((updatedtopic) => {
-      return res.status(200).json({
-        category: updatedtopic,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
-exports.likeForumPost = async (req, res) => {
-  const { id } = req.body;
-  if (!id) {
-    return res.status(422).json({
-      message: "Invalid request.",
-    });
-  }
-  Post.findOne({ _id: id })
-    .then((post) => {
-      if (post.likes.includes(req.user._id)) {
-        post.likes.splice(post.likes.indexOf(req.user._id), 1);
-      } else {
-        post.likes.push(req.user._id);
-      }
-      Post.findOneAndUpdate(
-        { _id: id },
-        { $set: { likes: post.likes } },
-        { new: true }
-      )
-        .then((updated) => {
-          return res.status(200).json({
-            post: updated,
-          });
-        })
-        .catch((err) => {
-          return res.status(500).json({
-            message: "something went wrong",
-          });
-        });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "something went wrong",
-      });
-    });
-};
-
-exports.createComment = async (req, res) => {
-  const { id, content } = req.body;
-  if (!id || !content)
-    return res.status(422).json({
-      message: "Invalid or incomplete data.",
-    });
-
-  const comment = new Comment({
-    user: req.user._id,
-    content: content,
-    post: id,
-  });
-
-  comment
-    .save()
-    .then((newcomment) => {
-      return res.status(200).json({
-        comment: newcomment,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "Something went wrong",
-      });
-    });
-};
-
-exports.getCommentsByPost = async (req, res) => {
-  const { postid } = req.params;
-
-  Comment.find({ post: postid })
-    .populate({
-      path: "user",
-      select: ["firstName", "lastName", "email", "enrollmentNumber"],
-    })
-    .then((comments) => {
-      return res.status(200).json({
-        sucsess: true,
-        comments,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "Something went wrong",
-      });
-    });
-};
-exports.deleteComment = async(req, res) => {
-  const id = req.params.id
-  let foundComment;
-  try{
-    foundComment = await Comment.findOne({_id: id})
-  }catch(err){
-    return res.status(500).json({
-      message: "Something went wrong",
-    })
-  }
-  if(!foundComment){
-    return res.status(404).json({
-      message: "Comment not found",
-    })
-  }
-  if(!foundComment.user.equals(req.user._id)){
-    return res.status(401).json({
-      message: "Unauthorized"
-    })
-  }
-
-  Comment.deleteOne({_id: id}).then((data)=>{
-    return res.status(200).json({
-      data
-    })
-  }).catch((err)=>{
-    return res.status(500).json({
-      message: "Something went wrong"
-    })
-  })
-}
-exports.deleteCommentAdmin = async(req, res) => {
-  const id = req.params.id
-  let foundComment;
-  try{
-    foundComment = await Comment.findOne({_id: id})
-  }catch(err){
-    return res.status(500).json({
-      message: "Something went wrong",
-    })
-  }
-  if(!foundComment){
-    return res.status(404).json({
-      message: "Comment not found",
-    })
-  }
-
-  Comment.deleteOne({_id: id}).then((data)=>{
-    return res.status(200).json({
-      data
-    })
-  }).catch((err)=>{
-    return res.status(500).json({
-      message: "Something went wrong"
-    })
-  })
-}
 exports.deletePost = async(req, res) => {
   const id = req.params.id
   let foundPost;
@@ -493,7 +362,8 @@ exports.deletePost = async(req, res) => {
       message: "Something went wrong"
     })
   })
-}
+};
+
 exports.deletePostAdmin = async(req, res) => {
   const id = req.params.id
   let foundPost;
@@ -525,4 +395,150 @@ exports.deletePostAdmin = async(req, res) => {
       message: "Something went wrong"
     })
   })
-}
+};
+
+//Forum comments
+exports.getCommentsByPost = async (req, res) => {
+  const { postid } = req.params;
+
+  Comment.find({ post: postid })
+    .populate({
+      path: "user",
+      select: ["firstName", "lastName", "email", "enrollmentNumber"],
+    })
+    .then((comments) => {
+      return res.status(200).json({
+        sucsess: true,
+        comments,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
+
+exports.createComment = async (req, res) => {
+  const { id, content } = req.body;
+  if (!id || !content)
+    return res.status(422).json({
+      message: "Invalid or incomplete data.",
+    });
+
+  const comment = new Comment({
+    user: req.user._id,
+    content: content,
+    post: id,
+  });
+
+  comment
+    .save()
+    .then((newcomment) => {
+      return res.status(200).json({
+        comment: newcomment,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
+
+exports.deleteComment = async(req, res) => {
+  const id = req.params.id
+  let foundComment;
+  try{
+    foundComment = await Comment.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong",
+    })
+  }
+  if(!foundComment){
+    return res.status(404).json({
+      message: "Comment not found",
+    })
+  }
+  if(!foundComment.user.equals(req.user._id)){
+    return res.status(401).json({
+      message: "Unauthorized"
+    })
+  }
+
+  Comment.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+};
+
+exports.deleteCommentAdmin = async(req, res) => {
+  const id = req.params.id
+  let foundComment;
+  try{
+    foundComment = await Comment.findOne({_id: id})
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong",
+    })
+  }
+  if(!foundComment){
+    return res.status(404).json({
+      message: "Comment not found",
+    })
+  }
+
+  Comment.deleteOne({_id: id}).then((data)=>{
+    return res.status(200).json({
+      data
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  })
+};
+
+//Forum Likes
+exports.likeForumPost = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(422).json({
+      message: "Invalid request.",
+    });
+  }
+  Post.findOne({ _id: id })
+    .then((post) => {
+      if (post.likes.includes(req.user._id)) {
+        post.likes.splice(post.likes.indexOf(req.user._id), 1);
+      } else {
+        post.likes.push(req.user._id);
+      }
+      Post.findOneAndUpdate(
+        { _id: id },
+        { $set: { likes: post.likes } },
+        { new: true }
+      )
+        .then((updated) => {
+          return res.status(200).json({
+            post: updated,
+          });
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            message: "something went wrong",
+          });
+        });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "something went wrong",
+      });
+    });
+};

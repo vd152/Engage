@@ -11,8 +11,8 @@ exports.createSchedule = async (req, res) => {
   try {
     scheduleFound = await Schedule.findOne({
       group: group,
-      from: { $lte: (to) },
-      to: { $gte: (from) },
+      from: { $lte: to },
+      to: { $gte: from },
     });
   } catch (err) {
     return res.status(500).json({
@@ -57,6 +57,69 @@ exports.getScheduleByGroup = async (req, res) => {
     .then((schedule) => {
       return res.status(200).json({
         schedule,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
+
+exports.deleteSchedule = async (req, res) => {
+  const id = req.params.id;
+  let foundSchedule;
+  try {
+    foundSchedule = await Schedule.findOne({ _id: id });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+  if (!foundSchedule) {
+    return res.status(404).json({
+      message: "Schedule not found",
+    });
+  }
+  if (!foundSchedule.createdBy.equals(req.user._id)) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+
+  Schedule.deleteOne({ _id: id })
+    .then((data) => {
+      return res.status(200).json({
+        data,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
+
+exports.deleteScheduleAdmin = async (req, res) => {
+  const id = req.params.id;
+  let foundSchedule;
+  try {
+    foundSchedule = await Schedule.findOne({ _id: id });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+  if (!foundSchedule) {
+    return res.status(404).json({
+      message: "Schedule not found",
+    });
+  }
+
+  Schedule.deleteOne({ _id: id })
+    .then((data) => {
+      return res.status(200).json({
+        data,
       });
     })
     .catch((err) => {
@@ -142,62 +205,3 @@ exports.getAllVotes = async (req, res) => {
       });
     });
 };
-
-exports.deleteSchedule = async (req, res) => {
-  const id = req.params.id
-  let foundSchedule;
-  try{
-    foundSchedule = await Schedule.findOne({_id: id})
-  }catch(err){
-    return res.status(500).json({
-      message: "Something went wrong",
-    })
-  }
-  if(!foundSchedule){
-    return res.status(404).json({
-      message: "Schedule not found",
-    })
-  }
-  if(!foundSchedule.createdBy.equals(req.user._id)){
-    return res.status(401).json({
-      message: "Unauthorized"
-    })
-  }
-
-  Schedule.deleteOne({_id: id}).then((data)=>{
-    return res.status(200).json({
-      data
-    })
-  }).catch((err)=>{
-    return res.status(500).json({
-      message: "Something went wrong"
-    })
-  })
-}
-
-exports.deleteScheduleAdmin = async (req, res) => {
-  const id = req.params.id
-  let foundSchedule;
-  try{
-    foundSchedule = await Schedule.findOne({_id: id})
-  }catch(err){
-    return res.status(500).json({
-      message: "Something went wrong",
-    })
-  }
-  if(!foundSchedule){
-    return res.status(404).json({
-      message: "Schedule not found",
-    })
-  }
-
-  Schedule.deleteOne({_id: id}).then((data)=>{
-    return res.status(200).json({
-      data
-    })
-  }).catch((err)=>{
-    return res.status(500).json({
-      message: "Something went wrong"
-    })
-  })
-}

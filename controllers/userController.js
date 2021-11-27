@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const util = require("../utils/generateToken");
+
 exports.getUsers = async (req, res) => {
   User.find()
     .populate("role")
@@ -15,6 +16,30 @@ exports.getUsers = async (req, res) => {
       });
     });
 };
+
+exports.getUser = async (req, res) => {
+  let id = req.params.id;
+  User.findById(id)
+    .populate("role")
+    .populate("groups")
+    .populate({
+      path: "groups",
+      populate: [{ path: "createdBy", select: ["firstName", "lastName"] }],
+    })
+    .select("-password")
+    .then((user) => {
+      return res.status(200).json({
+        user,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        success: "false",
+        message: "Something went wrong",
+      });
+    });
+};
+
 exports.registerUser = async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -83,53 +108,30 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.getUser = async (req, res) => {
-  let id = req.params.id;
-  User.findById(id)
-    .populate("role")
-    .populate("groups")
-    .populate({
-      path: "groups",
-      populate: [{ path: "createdBy", select: ["firstName", "lastName"] }],
-    })
-    .select("-password")
-    .then((user) => {
-      return res.status(200).json({
-        user,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        success: "false",
-        message: "Something went wrong",
-      });
-    });
-};
-
 exports.deleteUser = async (req, res) => {
   const id = req.body.id;
   let foundUser;
-  try{
+  try {
     foundUser = await User.findOne({ _id: id });
-  }catch(err){
+  } catch (err) {
     return res.status(500).json({
-      message: "Something went wrong."
-    })
+      message: "Something went wrong.",
+    });
   }
-  if(foundUser.email === "admin@gmail.com"){
+  if (foundUser.email === "admin@gmail.com") {
     return res.status(400).json({
-      message: "Admin cannot be deleted"
-    })
+      message: "Admin cannot be deleted",
+    });
   }
-  if(!foundUser){
+  if (!foundUser) {
     return res.status(404).json({
-      message: "User not found."
-    })
+      message: "User not found.",
+    });
   }
-  if(foundUser._id.equals(req.user._id)){
+  if (foundUser._id.equals(req.user._id)) {
     return res.status(400).json({
-      message: "Please don't delete yourself."
-    })
+      message: "Please don't delete yourself.",
+    });
   }
   User.deleteOne({ _id: id })
     .then((data) => {
@@ -166,8 +168,11 @@ exports.editUser = async (req, res) => {
     });
   }
   let newUser = { foundUser, ...user };
-  if(foundUser.firstName !== user.firstName || foundUser.lastName !== user.lastName) {
-    newUser.vaccinationStatus = false
+  if (
+    foundUser.firstName !== user.firstName ||
+    foundUser.lastName !== user.lastName
+  ) {
+    newUser.vaccinationStatus = false;
   }
   User.findOneAndUpdate({ _id: id }, { $set: newUser }, { new: true })
     .select("-password")

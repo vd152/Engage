@@ -3,38 +3,38 @@ const mongoose = require("mongoose");
 const postSchema = new mongoose.Schema(
   {
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'categories',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "categories",
+      required: true,
     },
     topic: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'categories',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "categories",
+      required: true,
     },
     title: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     content: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     group: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'groups',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "groups",
     },
     likes: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'users'
-        }
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+      },
     ],
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
-        required: true
-    }
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
   },
   { timestamps: true }
 );

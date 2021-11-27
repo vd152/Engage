@@ -1,6 +1,6 @@
 const Group = require("../models/groupModel");
 const User = require("../models/userModel");
-const Schedule = require("../models/scheduleModel")
+const Schedule = require("../models/scheduleModel");
 exports.getGroups = async (req, res) => {
   Group.find()
     .then((groups) => {
@@ -63,6 +63,99 @@ exports.addGroup = async (req, res) => {
     .catch((err) => {
       return res.status(500).json({
         message: "Something went wrong",
+      });
+    });
+};
+
+exports.deleteGroup = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(404).json({
+      message: "Please fill required field.",
+    });
+  }
+  let foundGroup;
+  try {
+    foundGroup = await Group.findOne({ _id: id });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+  if (!foundGroup) {
+    return res.status(404).json({
+      message: "Group not found",
+    });
+  }
+  Schedule.deleteMany({ group: id })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong while deleting schedules",
+      });
+    });
+  Group.deleteOne({ _id: id })
+    .then((data) => {
+      return res.status(200).json({
+        data,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong",
+      });
+    });
+};
+
+exports.editGroup = async (req, res) => {
+  const { name, code } = req.body;
+  const id = req.params.id;
+
+  if (!name || !code) {
+    return res.status(422).json({
+      message: "Please fill all the required fields.",
+    });
+  }
+  let groupExists;
+  try {
+    groupExists = await Group.findOne({ _id: id }).populate("createdBy");
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong.",
+    });
+  }
+  if (!groupExists) {
+    return res.status(404).json({
+      message: "Group does not exists",
+    });
+  }
+  Group.findOne({ code })
+    .then((group) => {
+      if (!group._id.equals(id)) {
+        return res.status(400).json({
+          message: "Group code already in use.",
+        });
+      }
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong.",
+      });
+    });
+  groupExists.name = name;
+  groupExists.code = code;
+
+  Group.findByIdAndUpdate({ _id: id }, { $set: groupExists }, { new: true })
+    .then((newGroup) => {
+      return res.status(200).json({
+        group: newGroup,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: "Something went wrong.",
       });
     });
 };
@@ -176,92 +269,3 @@ exports.leaveGroup = async (req, res) => {
       });
     });
 };
-
-exports.deleteGroup = async (req, res) => {
-  const { id } = req.body;
-  if (!id) {
-    return res.status(404).json({
-      message: "Please fill required field.",
-    });
-  }
-  let foundGroup;
-  try {
-    foundGroup = await Group.findOne({ _id: id });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Something went wrong",
-    });
-  }
-  if (!foundGroup) {
-    return res.status(404).json({
-      message: "Group not found",
-    });
-  }
-  Schedule.deleteMany({group: id}).then(data=>{
-    console.log(data)
-  }).catch((err) =>{
-    return res.status(500).json({
-      message: "Something went wrong while deleting schedules"
-    })
-  })
-  Group.deleteOne({ _id: id })
-    .then((data) => {
-      return res.status(200).json({
-        data,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        message: "Something went wrong",
-      });
-    });
-};
-exports.editGroup = async (req, res) => {
-  const {name, code} = req.body
-  const id = req.params.id
-  
-  if (!name || !code) {
-    return res.status(422).json({
-      message: "Please fill all the required fields.",
-    });
-  }
-  let groupExists;
-  try {
-    groupExists = await Group.findOne({ _id: id }).populate("createdBy");
-  } catch (err) {
-    return res.status(500).json({
-      message: "Something went wrong.",
-    });
-  }
-  if (!groupExists) {
-    return res.status(404).json({
-      message: "Group does not exists",
-    });
-  }
-  Group.findOne({code}).then(group=>{
-    if(!group._id.equals(id)){
-      return res.status(400).json({
-        message: "Group code already in use."
-      })
-    }
-  }).catch(err=>{
-    return res.status(500).json({
-      message: "Something went wrong.",
-    });
-  })
-  groupExists.name = name;
-  groupExists.code = code;
-  
-  Group.findByIdAndUpdate({_id: id}, {$set: groupExists}, { new: true})
-  .then(newGroup=>{
-    return res.status(200).json({
-      group: newGroup
-    })
-  }).catch(err=>{
-    return res.status(500).json({
-      message: "Something went wrong.",
-    });
-  })
-
-
-}
