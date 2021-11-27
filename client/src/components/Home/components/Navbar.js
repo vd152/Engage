@@ -13,7 +13,7 @@ export default function Navbar() {
         <h4 className="text-white">Classroom Extended</h4>
       </a>
       <div className={`menu ${toggle && "active"}`}>
-        <ul className="nav-menu">         
+        <ul className="nav-menu p-0">         
           <li className="nav-item">
             <Link to={"/login"} className="btn add-button btn-home nav-link">
               Login

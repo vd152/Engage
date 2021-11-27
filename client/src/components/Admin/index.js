@@ -17,21 +17,21 @@ class Manage extends React.Component {
               <p className={this.state.active == "user"? "nav-link active": "nav-link"} aria-current="page"  onClick={(e)=>{
                   this.setState({active: "user"})
                   }}>
-                Manage Users
+                    { window.innerHeight < window.innerWidth ? "Manage Users": "Users"}
               </p>
             </li>
             <li className="nav-item">
               <p className={this.state.active == "role"? "nav-link active": "nav-link"}  onClick={(e)=>{
                   this.setState({active: "role"})
                   }}>
-                Manage Roles
+                { window.innerHeight < window.innerWidth ? "Manage Roles": "Roles"}
               </p>
             </li>
             <li className="nav-item">
               <p className={this.state.active == "forum"? "nav-link active": "nav-link"} aria-current="page"  onClick={(e)=>{
                   this.setState({active: "forum"})
                   }}>
-                Manage Forum
+                { window.innerHeight < window.innerWidth ? "Manage Forum": "Forum"}
               </p>
             </li>
           </ul>

@@ -6,8 +6,8 @@ import {setAuthToken, setUser} from '../../utils/localStorage'
 import { toast } from 'react-toastify';
 class Auth extends React.Component {
   state={
-    email: "",
-    password: "",
+    email: "admin@gmail.com",
+    password: "admin@123",
     redirect: false,
     loading: false
   }

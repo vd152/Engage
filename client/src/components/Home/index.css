@@ -32,7 +32,7 @@ a {
   min-height: 80vh;
 }
 .feature-row img {
-  width: 70%;
+  width: 85%;
 }
 .feature-row:nth-child(odd) h6 {
   font-size: 2.6em;
@@ -53,5 +53,14 @@ a {
 @media only screen and (max-width: 767px) {
   .feature-row .col-md-6{
     text-align: center !important;
+  }
+  .feature-row h6{
+    font-size: 1.4em !important;
+  }
+  .feature-row p{
+    font-size: 1.2em !important
+  }
+  .img-container{
+    text-align: center !important
   }
 }

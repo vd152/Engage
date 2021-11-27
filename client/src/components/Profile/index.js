@@ -156,10 +156,10 @@ class Profile extends React.Component {
             </div>
           </form>
           <>
-              <div className="col-md-4 m-3">
+              <div className="col-md-4 m-md-3 m-0 col-12 vac-user">
             {!this.props.user?.vaccinationStatus && (
                 <div className="form-group">
-                  <label className="form-label m-1">Vaccination Status</label>
+                  <label className="form-label m-md-1 m-0">Vaccination Status</label>
                   <button
                     className="btn add-button"
                     data-bs-toggle="modal"
@@ -171,7 +171,7 @@ class Profile extends React.Component {
             )}
               </div>
             {!this.state.disabled && (
-              <div className="col-md-4 m-1 px-5 text-end">
+              <div className="col-md-4 m-md-1 px-md-5 px-0 my-1 text-end edit-user">
                 <div className="form-group text-right">
                   <button
                     className="btn add-button"

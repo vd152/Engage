@@ -2,3 +2,9 @@
     height:100px;
     width:100px;
 }
+@media only screen and (max-width: 767px){
+    .edit-user, .vac-user{
+        width:100%;
+        text-align:center !important;
+    }
+}

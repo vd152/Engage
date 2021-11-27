@@ -108,6 +108,29 @@ exports.getUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   const id = req.body.id;
+  let foundUser;
+  try{
+    foundUser = await User.findOne({ _id: id });
+  }catch(err){
+    return res.status(500).json({
+      message: "Something went wrong."
+    })
+  }
+  if(foundUser.email === "admin@gmail.com"){
+    return res.status(400).json({
+      message: "Admin cannot be deleted"
+    })
+  }
+  if(!foundUser){
+    return res.status(404).json({
+      message: "User not found."
+    })
+  }
+  if(foundUser._id.equals(req.user._id)){
+    return res.status(400).json({
+      message: "Please don't delete yourself."
+    })
+  }
   User.deleteOne({ _id: id })
     .then((data) => {
       return res.status(200).json({

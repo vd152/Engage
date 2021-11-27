@@ -146,7 +146,7 @@ class Sidebar extends React.Component {
             </div>
             <div
               className={
-                this.props.active === "Profile" ? "activeSideNavLink" : ""
+                this.props.active === "Profile" ? "activeSideNavLink" : "text-white"
               }
             >
               Profile

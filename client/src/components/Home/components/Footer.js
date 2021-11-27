@@ -15,13 +15,13 @@ export default function Footer() {
         <a href="https://github.com/vd152" target="_blank">
           <FaGithub />
         </a>
-        <a href="https://www.linkedin.com/in/vidhi-angrish/">
+        <a href="https://www.linkedin.com/in/vidhi-angrish/" target="_blank">
           <FaLinkedin/>
         </a>
-        <a href="https://www.instagram.com/_vidhiangrish_/">
+        <a href="https://www.instagram.com/_vidhiangrish_/" target="_blank">
           <FaInstagram />
         </a>
-        <a href="https://vidhiangrish.com/">
+        <a href="https://vidhiangrish.com/" target="_blank">
           <FaGlobe />
         </a>
       </div>

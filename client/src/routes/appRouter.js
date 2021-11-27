@@ -12,7 +12,7 @@ import Groups from "../components/Groups";
 import Schedule from "../components/Schedule";
 import Forum from "../components/Forum";
 import Profile from "../components/Profile";
-import Manage from "../components/UsersRoles";
+import Manage from "../components/Admin";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../components/Main/Loader";
