@@ -1,16 +1,19 @@
 # Classroom Extended
 
-is a student engagement portal developed by [@vd152](https://github.com/vd152/) under Microsoft Engage 2021 program.
+Classroom Extended is a student engagement portal developed by [@vd152](https://github.com/vd152/) under Microsoft Engage 2021 program.
+
+Live app: [https://engage.vidhiangrish.com](https://engage.vidhiangrish.com/)
 
 ## Problem Statement
 
 Build a functional prototype of a platform that gives students an array of digital academic and social tools to stay engaged with their studies, peers and broader university community during pandemic. 
 
-## Demo
+## Video Demo
 
-Click [here]() to open the web application.
+Click [here](https://youtu.be/EgdZdPX9SrI) to open the web application.
 
 ## Features
+
 - User Authentication and session storage with JWT tokens
 - Vaccination Certificate Verification (only for India)
 - Class scheduler with preference for mode of class
@@ -24,6 +27,18 @@ Click [here]() to open the web application.
 **Client:** ReactJs
 
 **Database:** MongoDB
+
+## Agile Methodology
+
+### Documentation: [Doc](https://docs.google.com/document/d/1_7bkD1yZgsSdIDACvUz7A3E76T4yFxrCCwsoc970z-k/edit?usp=sharing)
+
+### Brief: 
+* I divided the 3-week program into four sprints. Each sprint consists of 5-6 days.
+* In the first sprint, I researched on the problem statement and decided the major features of the application i.e. Class Scheduler and Online Forum Community.
+* I completed the flow of my application and decided the models that my application will contain in the first week itself.
+* In the second sprint, I started making the web application, beginning with the application initialization, router setup, models creations, and user authentication. I also began creating the UI of the application and the admin panel.
+* In the third sprint, I implemented the Group and Scheduler features along with setting up permissions for the user roles.
+* In the final sprint, I integrated the vaccine certification verification provided by COWIN India and implemented the Forum post, likes and comments features.
 
 ## Run Locally
 
